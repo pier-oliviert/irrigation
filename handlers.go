@@ -37,6 +37,7 @@ func homepage(w http.ResponseWriter, r *http.Request)  {
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
     }
+    return
 }
 
 func createSchedule(w http.ResponseWriter, r *http.Request) {
@@ -87,6 +88,7 @@ func createSchedule(w http.ResponseWriter, r *http.Request) {
         log.Println(err)
     }
     http.Redirect(w, r, "/", 302)
+    return
 }
 
 func updateSchedule(w http.ResponseWriter, r *http.Request) {
@@ -125,6 +127,7 @@ func updateSchedule(w http.ResponseWriter, r *http.Request) {
   } else {
     db.Orm().Update(schedule)
   }
+  return
 }
 
 func editSchedule(w http.ResponseWriter, r *http.Request) {
@@ -140,6 +143,7 @@ func editSchedule(w http.ResponseWriter, r *http.Request) {
   if err != nil {
     log.Println(err)
   }
+  return
 }
 
 func showValve(w http.ResponseWriter, r *http.Request) {
@@ -162,6 +166,7 @@ func showValve(w http.ResponseWriter, r *http.Request) {
     "Schedules": schedules,
     "Valve": valve,
   })
+  return
 }
 
 func editValve(w http.ResponseWriter, r *http.Request) {
@@ -176,6 +181,7 @@ func editValve(w http.ResponseWriter, r *http.Request) {
   if err != nil {
     log.Println(err)
   }
+  return
 }
 
 func updateValve(w http.ResponseWriter, r *http.Request) {
@@ -193,6 +199,7 @@ func updateValve(w http.ResponseWriter, r *http.Request) {
   }
 
   http.Redirect(w, r, "/", 302)
+  return
 }
 
 func openValve(w http.ResponseWriter, r *http.Request) {
@@ -205,6 +212,7 @@ func openValve(w http.ResponseWriter, r *http.Request) {
 
     }
     http.Redirect(w, r, "/", 302)
+  return
 }
 
 func closeValve(w http.ResponseWriter, r *http.Request) {
@@ -217,4 +225,5 @@ func closeValve(w http.ResponseWriter, r *http.Request) {
 
     }
     http.Redirect(w, r, "/", 302)
+  return
 }

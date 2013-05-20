@@ -1,0 +1,12 @@
+{{ define "content" }}
+
+  <h1>Schedules for {{ .Valve.Title }}</h1>
+  
+  {{ range .Schedules }}
+    <p>
+      Starting {{ .DateTimeInputValue }}, will open every {{ .Interval }} for {{ .Length }}
+      <a href="/schedules/{{ .Id }}/edit">Edit</a>
+    </p>
+  {{ end }}
+{{ end }}
+

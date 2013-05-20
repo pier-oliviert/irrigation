@@ -1,0 +1,38 @@
+{{ define "content" }}
+  <h1>Irrigation</h1>
+
+  <h2>Create a schedule</h2>
+  <form action="/schedules" method="POST">
+    <input type="datetime-local" name="date" />
+
+    <select name="valve">
+      {{range .Relays}}
+        <option value="{{ .Id }}">{{ .RelayId }}</option>
+      {{ end }}
+    </select>
+
+    <p>Every</p>
+    <input type="text" name="interval[multiplicator]" />
+    <select name="interval[denominator]">
+      <option value="second">Seconds</option>
+      <option value="minute">Minutes</option>
+      <option value="hour">Hours</option>
+      <option value="day">Days</option>
+      <option value="month">Months</option>
+    </select>
+
+    <p>For</p>
+    <input type="text" name="length[multiplicator]" />
+    <select name="length[denominator]">
+      <option value="second">Seconds</option>
+      <option value="minute">Minutes</option>
+      <option value="hour">Hours</option>
+      <option value="day">Days</option>
+      <option value="month">Months</option>
+    </select>
+
+  <input type="submit" />
+
+  </form>
+
+{{ end }}

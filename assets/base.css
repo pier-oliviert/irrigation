@@ -1,0 +1,13 @@
+body {
+    background: rgb(255,248,228);
+}
+
+h1 {
+  text-align: center;
+  text-shadow: 0 1px #FFF;
+  color: #4C4C4C;
+}
+
+ul {
+    list-style-type: none;
+}

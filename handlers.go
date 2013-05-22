@@ -2,12 +2,18 @@ package main
 
 import (
   "net/http"
-    "strconv"
-    "html/template"
-    "log"
-    "irrigation/db"
-    "irrigation/models"
+  "strconv"
+  "html/template"
+  "log"
+  "irrigation/db"
+  "irrigation/models"
+  "irrigation/helpers"
 )
+
+var errorTmpl = template.Must(template.ParseFiles(
+    "views/_base.html",
+    "views/error.html",
+))
 
 var indexTmpl = template.Must(template.ParseFiles(
     "views/_base.html",
@@ -41,54 +47,56 @@ func homepage(w http.ResponseWriter, r *http.Request)  {
 }
 
 func createSchedule(w http.ResponseWriter, r *http.Request) {
-    if r.Method != "POST" {
-        //Set a flash and redirect
-        http.Redirect(w, r, "/", 302)
-    }
-    r.ParseForm()
-    valveId, err := strconv.ParseInt(r.PostFormValue("valve"), 10, 32)
-    if err != nil {
-        log.Fatalln(err)
-    }
-    valve, err := models.GetValveById(int32(valveId))
-    
-    if err != nil {
-      log.Println(err)
-      http.Redirect(w, r, "/", 302)
-    }
+  var schedule *models.Schedule
+  var valve *models.Valve
+  var err error
 
-    schedule := &models.Schedule{
-        ValveId: valve.Id,
-        Active: true,
-    }
+  valve, err = models.GetValveById(helpers.Int32ValueFrom(r.PostFormValue("valve"), -1))
 
-    err = schedule.SetInterval(
-        r.PostFormValue("interval[multiplicator]"),
-        r.PostFormValue("interval[denominator]"))
+  if err != nil {
+    goto Error
+  }
 
-    if err != nil {
-        log.Fatal(err)
-    }
+  schedule = &models.Schedule{
+    ValveId: valve.Id,
+    Active: true,
+  }
 
-    err = schedule.SetLength(
-        r.PostFormValue("length[multiplicator]"),
-        r.PostFormValue("length[denominator]"))
+  err = schedule.SetInterval(
+    r.PostFormValue("interval[multiplicator]"),
+    r.PostFormValue("interval[denominator]"))
 
-    if err != nil {
-        log.Fatal(err)
-    }
+  if err != nil {
+    goto Error
+  }
 
-    err = schedule.SetStart(r.PostFormValue("date"))
-    if err != nil {
-        log.Println(err)
-    }
+  err = schedule.SetLength(
+    r.PostFormValue("length[multiplicator]"),
+    r.PostFormValue("length[denominator]"))
 
-    err = db.Orm().Insert(schedule)
-    if err != nil {
-        log.Println(err)
-    }
-    http.Redirect(w, r, "/", 302)
-    return
+  if err != nil {
+    goto Error
+  }
+
+  err = schedule.SetStart(r.PostFormValue("date"))
+  if err != nil {
+    goto Error
+  }
+
+  err = db.Orm().Insert(schedule)
+  if err != nil {
+    goto Error
+  }
+
+  http.Redirect(w, r, "/", 302)
+  return
+
+  Error:
+  tmpl_err := errorTmpl.Execute(w, err)
+  if tmpl_err != nil {
+    log.Panicln(err)
+  }
+
 }
 
 func updateSchedule(w http.ResponseWriter, r *http.Request) {
@@ -124,9 +132,9 @@ func updateSchedule(w http.ResponseWriter, r *http.Request) {
 
   if err != nil {
     log.Println(err)
-  } else {
-    db.Orm().Update(schedule)
-  }
+  } 
+
+  db.Orm().Update(schedule)
   return
 }
 
@@ -147,12 +155,17 @@ func editSchedule(w http.ResponseWriter, r *http.Request) {
 }
 
 func showValve(w http.ResponseWriter, r *http.Request) {
-  valveId, _ := strconv.Atoi(r.URL.Path[len("/valves/"):])
-  valve, err := models.GetValveById(int32(valveId))
+  valve, err := models.GetValveById(helpers.Int32ValueFrom(r.URL.Query().Get(":valveId"), -1))
   
   if err != nil {
     log.Println(err)
     http.Redirect(w, r, "/", 302)
+    return
+  }
+
+  if valve == nil {
+    http.Redirect(w, r, "/", 302)
+    return
   }
 
   schedules, err := models.GetSchedulesForValve(valve)
@@ -227,3 +240,4 @@ func closeValve(w http.ResponseWriter, r *http.Request) {
     http.Redirect(w, r, "/", 302)
   return
 }
+

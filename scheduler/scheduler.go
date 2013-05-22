@@ -1,72 +1,73 @@
 package scheduler
 
 import (
-    "time"
-    "irrigation/models"
-    "irrigation/db"
-    "log"
+	"irrigation/db"
+	"irrigation/models"
+	"log"
+	"time"
 )
 
 var working = true
 
 func Run() {
-    working = true
-    go func() {
-        for working == true {
-            time.Sleep(time.Second)
-            LaunchScheduledEntries(scheduledToLaunch())
-        }
-    }()
-    return
+	working = true
+	go func() {
+		for working == true {
+			time.Sleep(time.Second)
+			LaunchScheduledEntries(scheduledToLaunch())
+		}
+	}()
+	return
 }
 
 func Stop() {
-    working = false
-    models.CloseAllValves()
+	working = false
+	models.CloseAllValves()
 }
 
 func IsRunning() bool {
-    return !!working
+	return !!working
 }
 
-
 func LaunchScheduledEntries(list []*models.Schedule) {
-    for i := 0; i < len(list); i++ {
-        schedule := list[i]
-        valve, err := schedule.Valve()
-        
-        if err != nil {
-            log.Fatalln(err)
-        }
+	for i := 0; i < len(list); i++ {
+		schedule := list[i]
+		valve, err := schedule.Valve()
 
-        entry := &models.Entry{
-            Length: schedule.Length,
-            ValveId: valve.Id,
-        }
+		if err != nil {
+			log.Fatalln(err)
+		}
 
-        err = db.Orm().Insert(entry)
+		entry := &models.Entry{
+			Length:  schedule.Length,
+			ValveId: valve.Id,
+		}
 
-        if err != nil {
-            log.Fatalln(err)
-        }
-    }
+		err = db.Orm().Insert(entry)
+
+		if err != nil {
+			log.Fatalln(err)
+		}
+	}
 }
 
 func scheduledToLaunch() []*models.Schedule {
-    active_at := time.Now().Truncate(time.Second).Unix()
-    query := "select *" +
-      "from schedules s " +
-      "where s.Active = 1 and " +
-      "( s.Start = ? OR ( (strftime('%s', 'now') - strftime(s.Start)) % s.Interval) = 0)"
-    instances, err := db.Orm().Select(models.Schedule{}, query, active_at)
+	active_at := time.Now().Truncate(time.Second).Unix()
+	query := "select *" +
+		"from schedules s " +
+		"where s.Active = 1 and " +
+		"( s.Start = ? OR ( (strftime('%s', 'now') - strftime(s.Start)) % s.Interval) = 0)"
+	instances, err := db.Orm().Select(models.Schedule{}, query, active_at)
 
-    if err != nil {
-        log.Fatalln(err)
-    }
+	if err != nil {
+		log.Fatalln(err)
+	}
 
-    schedules := make([]*models.Schedule, len(instances))
+	schedules := make([]*models.Schedule, len(instances))
 
-    for i, instance := range instances { schedules[i] = instance.(*models.Schedule) }
+	for i, instance := range instances {
+		schedules[i] = instance.(*models.Schedule)
+	}
 
-    return schedules
+	return schedules
 }

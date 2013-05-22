@@ -6,23 +6,28 @@
     <input type="datetime-local" name="date" value="{{ .DateTimeInputValue }}" />
 
     <p>Every</p>
-    <input type="text" name="interval[multiplicator]" value="{{ .Interval }}"/>
+    <input type="text" name="interval[multiplicator]" value="{{ .Multiplicator .Interval }}"/>
     <select name="interval[denominator]">
-      <option value="second">Seconds</option>
-      <option value="minute">Minutes</option>
-      <option value="hour">Hours</option>
-      <option value="day">Days</option>
-      <option value="month">Months</option>
+      <option value="second" {{.Selected "second" .Interval }} >Seconds</option>
+      <option value="minute" {{.Selected "minute" .Interval }} >Minutes</option>
+      <option value="hour" {{.Selected "hour" .Interval }} >Hours</option>
+      <option value="day" {{.Selected "day" .Interval }} >Days</option>
+      <option value="week" {{.Selected "week" .Interval }} >Weeks</option>
     </select>
 
     <p>For</p>
-    <input type="text" name="length[multiplicator]" value="{{ .Length }}" />
+    <input type="text" name="length[multiplicator]" value="{{ .Multiplicator .Length }}" />
     <select name="length[denominator]">
-      <option value="second">Seconds</option>
-      <option value="minute">Minutes</option>
-      <option value="hour">Hours</option>
-      <option value="day">Days</option>
-      <option value="month">Months</option>
+      <option value="second" {{.Selected "second" .Length }}>Seconds</option>
+      <option value="minute" {{.Selected "minute" .Length }}>Minutes</option>
+      <option value="hour" {{.Selected "hour" .Length }}>Hours</option>
+      <option value="day" {{.Selected "day" .Length }}>Days</option>
+      <option value="week" {{.Selected "week" .Length }}>Weeks</option>
+    </select>
+
+    <select name="status">
+      <option>On</option>
+      <option>Off</option>
     </select>
 
     <input type="submit" />

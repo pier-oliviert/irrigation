@@ -20,7 +20,6 @@ $ ./irrigation -server
 ```
 
 ## Dependencies
-
-- Gorilla/Pat( go get github.com/gorilla/pat )
-- Gopi( go get github.com/pothibo/gopi )
-- Gorp( go get github.com/coopernurse/gopi )
+```bash
+$ go get ./...
+```

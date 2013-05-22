@@ -10,33 +10,41 @@ import (
   "irrigation/helpers"
 )
 
-var errorTmpl = template.Must(template.ParseFiles(
-    "views/_base.html",
-    "views/error.html",
-))
+var templates = map[string]*template.Template{}
 
-var indexTmpl = template.Must(template.ParseFiles(
+func init() {
+  templates["base"] = template.Must(template.ParseFiles(
     "views/_base.html",
-    "views/home.html",
-))
+  ))
 
-var valvesTmpl = template.Must(template.ParseFiles(
-    "views/_base.html",
-    "views/valves/show.html",
-))
+  templates["error"] = template.Must(
+    template.Must(templates["base"].Clone()).ParseFiles(
+      "views/error.html",
+    ))
 
-var editValveTmpl = template.Must(template.ParseFiles(
-    "views/_base.html",
-    "views/valves/edit.html",
-))
+  templates["home"] = template.Must(
+    template.Must(templates["base"].Clone()).ParseFiles(
+      "views/home.html",
+    ))
 
-var editScheduleTmpl = template.Must(template.ParseFiles(
-    "views/_base.html",
-    "views/schedules/edit.html",
-))
+  templates["showValve"] = template.Must(
+    template.Must(templates["base"].Clone()).ParseFiles(
+      "views/valves/show.html",
+    ))
+
+  templates["editValve"] = template.Must(
+    template.Must(templates["base"].Clone()).ParseFiles(
+      "views/valves/edit.html",
+    ))
+
+  templates["editSchedule"] = template.Must(
+    template.Must(templates["base"].Clone()).ParseFiles(
+      "views/schedules/edit.html",
+    ))
+}
 
 func homepage(w http.ResponseWriter, r *http.Request)  {
-    err := indexTmpl.Execute(w, map[string]interface{} {
+    err := templates["home"].Execute(w, map[string]interface{} {
         "Relays": Valves(),
     })
 
@@ -92,7 +100,7 @@ func createSchedule(w http.ResponseWriter, r *http.Request) {
   return
 
   Error:
-  tmpl_err := errorTmpl.Execute(w, err)
+  tmpl_err := templates["error"].Execute(w, err)
   if tmpl_err != nil {
     log.Panicln(err)
   }
@@ -146,7 +154,7 @@ func editSchedule(w http.ResponseWriter, r *http.Request) {
 
   schedule, err := models.GetScheduleById(int32(id))
 
-  err = editScheduleTmpl.Execute(w, schedule)
+  err = templates["editSchedule"].Execute(w, schedule)
 
   if err != nil {
     log.Println(err)
@@ -175,7 +183,7 @@ func showValve(w http.ResponseWriter, r *http.Request) {
     http.Redirect(w, r, "/", 302)
   }
 
-  err = valvesTmpl.Execute(w, map [string]interface{} {
+  err = templates["showValve"].Execute(w, map [string]interface{} {
     "Schedules": schedules,
     "Valve": valve,
   })
@@ -190,7 +198,7 @@ func editValve(w http.ResponseWriter, r *http.Request) {
   }
 
   valve, err := models.GetValveById(int32(id))
-  err = editValveTmpl.Execute(w, valve)
+  err = templates["editValve"].Execute(w, valve)
   if err != nil {
     log.Println(err)
   }

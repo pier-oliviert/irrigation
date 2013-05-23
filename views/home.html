@@ -1,42 +1,8 @@
 {{ define "content" }}
   <h1><a href="/">Irrigation</a></h1>
 
-  <h2>Create a schedule</h2>
-  <form action="/schedules" method="POST">
-    <input type="datetime-local" name="date" />
+  <a href="/schedules/new">Create a new schedule</a>
 
-    <select name="valve">
-      {{range .Valves}}
-        <option value="{{ .Id }}">{{ .Title }}</option>
-      {{ end }}
-    </select>
-
-    <p>Every</p>
-    <input type="text" name="interval[multiplicator]" value="0" />
-    <select name="interval[denominator]">
-      <option value="second">Seconds</option>
-      <option value="minute">Minutes</option>
-      <option value="hour">Hours</option>
-      <option value="day">Days</option>
-      <option value="month">Months</option>
-    </select>
-
-    <p>For</p>
-    <input type="text" name="length[multiplicator]" value="0" />
-    <select name="length[denominator]">
-      <option value="second">Seconds</option>
-      <option value="minute">Minutes</option>
-      <option value="hour">Hours</option>
-      <option value="day">Days</option>
-      <option value="month">Months</option>
-    </select>
-
-  <input type="submit" />
-
-  </form>
-
-
-  <h2>Valves status</h2>
   <ul class="valves">
     {{ range .Valves }}
       <li class="valve">
@@ -48,8 +14,10 @@
         <div class="status">
           {{ if .IsOpened }}
             <span>Opened</span>
+            <a href="/valves/{{ .Id }}/close">Close</a>
           {{ else }}
             <span>Closed</span>
+            <a href="/valves/{{ .Id }}/open">Open</a>
           {{ end }}
         </div>
       </li>

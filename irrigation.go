@@ -50,14 +50,15 @@ func launchServer() {
 	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
 
 	r := pat.New()
-	r.Get("/open/", openValve)
-	r.Get("/close/", closeValve)
 
 	r.Post("/schedules/{scheduleId}", updateSchedule)
 	r.Get("/schedules/{scheduleId}/edit", editSchedule)
+	r.Get("/schedules/new", newSchedule)
 	r.Post("/schedules", createSchedule)
 
 	r.Get("/valves/{valveId}/edit", editValve)
+	r.Get("/valves/{valveId}/open", openValve)
+	r.Get("/valves/{valveId}/close", closeValve)
 	r.Post("/valves/{valveId}", updateValve)
 	r.Get("/valves/{valveId}", showValve)
 

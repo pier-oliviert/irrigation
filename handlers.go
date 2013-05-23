@@ -37,6 +37,11 @@ func init() {
 			"views/valves/edit.html",
 		))
 
+	templates["newSchedule"] = template.Must(
+		template.Must(templates["base"].Clone()).ParseFiles(
+			"views/schedules/new.html",
+		))
+
 	templates["editSchedule"] = template.Must(
 		template.Must(
 			templates["base"].Clone()).Funcs(
@@ -156,6 +161,18 @@ func updateSchedule(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
+func newSchedule(w http.ResponseWriter, r *http.Request) {
+
+	err := templates["newSchedule"].Execute(w, map[string]interface{}{
+		"Valves": Valves(),
+	})
+
+	if err != nil {
+		log.Panicln(err)
+	}
+	return
+}
+
 func editSchedule(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.URL.Query().Get(":scheduleId"))
 	if err != nil {
@@ -167,7 +184,7 @@ func editSchedule(w http.ResponseWriter, r *http.Request) {
 	err = templates["editSchedule"].Execute(w, schedule)
 
 	if err != nil {
-		log.Println(err)
+		log.Panicln(err)
 	}
 	return
 }
@@ -234,9 +251,7 @@ func updateValve(w http.ResponseWriter, r *http.Request) {
 }
 
 func openValve(w http.ResponseWriter, r *http.Request) {
-	relay, _ := strconv.Atoi(r.URL.Path[len("/open/"):])
-
-	valve, err := models.GetValveByRelayId(relay)
+	valve, err := models.GetValveById(helpers.Int32ValueFrom(r.URL.Query().Get(":valveId"), -1))
 
 	if err == nil && valve != nil {
 		valve.Open()
@@ -247,9 +262,7 @@ func openValve(w http.ResponseWriter, r *http.Request) {
 }
 
 func closeValve(w http.ResponseWriter, r *http.Request) {
-	relay, _ := strconv.Atoi(r.URL.Path[len("/close/"):])
-
-	valve, err := models.GetValveByRelayId(relay)
+	valve, err := models.GetValveById(helpers.Int32ValueFrom(r.URL.Query().Get(":valveId"), -1))
 
 	if err == nil && valve != nil {
 		valve.Close()

@@ -1,13 +1,13 @@
 {{ define "content" }}
-  <h1>Irrigation</h1>
+  <h1><a href="/">Irrigation</a></h1>
 
   <h2>Create a schedule</h2>
   <form action="/schedules" method="POST">
     <input type="datetime-local" name="date" />
 
     <select name="valve">
-      {{range .Relays}}
-        <option value="{{ .Id }}">{{ .RelayId }}</option>
+      {{range .Valves}}
+        <option value="{{ .Id }}">{{ .Title }}</option>
       {{ end }}
     </select>
 
@@ -35,4 +35,24 @@
 
   </form>
 
+
+  <h2>Valves status</h2>
+  <ul class="valves">
+    {{ range .Valves }}
+      <li class="valve">
+        <h3><a href="/valves/{{ .Id }}">{{ .Title }}</a></h3>
+        <p class="description">
+          This valve has {{ .ActiveSchedules }} active schedules.
+        </p>
+
+        <div class="status">
+          {{ if .IsOpened }}
+            <span>Opened</span>
+          {{ else }}
+            <span>Closed</span>
+          {{ end }}
+        </div>
+      </li>
+    {{ end }}
+  </ul>
 {{ end }}

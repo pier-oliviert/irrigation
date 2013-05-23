@@ -4,6 +4,7 @@ import (
 	"gopi"
 	"irrigation/db"
 	"log"
+	"strconv"
 )
 
 type Valve struct {
@@ -18,10 +19,28 @@ func (v *Valve) IsOpened() bool {
 
 func (v *Valve) Title() string {
 	if v.Name == "" {
-		return "Relay #"
+		return "Relay #" + strconv.Itoa(int(v.Id))
 	} else {
 		return v.Name
 	}
+}
+
+func (v *Valve) ActiveSchedules() int {
+	count := 0
+	for _, schedule := range v.Schedules() {
+		if schedule.Active {
+			count++
+		}
+	}
+	return count
+}
+
+func (v *Valve) Schedules() []*Schedule {
+	schedules, err := GetSchedulesForValve(v)
+	if err != nil {
+		log.Println(err)
+	}
+	return schedules
 }
 
 func (v *Valve) Open() {

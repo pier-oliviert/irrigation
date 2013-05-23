@@ -20,9 +20,21 @@ func (s *Schedule) Valve() (valve *Valve, err error) {
 	return GetValveById(s.ValveId)
 }
 
+func (s *Schedule) Enabled() bool {
+	return s.Active == true
+}
+
+func (s *Schedule) Disabled() bool {
+	return s.Active == false
+}
+
 func (s *Schedule) DateTimeInputValue() string {
 	const layout = "2006-01-02T15:04"
 	return time.Unix(s.Start, 0).Format(layout)
+}
+
+func (s *Schedule) SetActive(value string) {
+	s.Active = value == "1"
 }
 
 func (s *Schedule) SetInterval(multiplicator string, dur string) error {
@@ -57,6 +69,7 @@ func (s *Schedule) SetLength(multiplicator string, dur string) error {
 
 func (s *Schedule) SetStart(date string) error {
 	const form = "2006-01-02T15:04"
+	const formWithSeconds = "2006-01-02T15:04:05"
 	loc, err := time.LoadLocation("America/Montreal")
 
 	if err != nil {
@@ -66,7 +79,10 @@ func (s *Schedule) SetStart(date string) error {
 	parsed, err := time.ParseInLocation(form, date, loc)
 
 	if err != nil {
-		return err
+		parsed, err = time.ParseInLocation(formWithSeconds, date, loc)
+		if err != nil {
+			return err
+		}
 	}
 
 	s.Start = parsed.UTC().Truncate(time.Second).Unix()

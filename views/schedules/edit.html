@@ -1,6 +1,6 @@
 {{ define "content" }}
 
-  <h1>Edit Schedule</h1>
+  <h1><a href="/">Irrigation</a></h1>
 
   <form action="/schedules/{{ .Id }}" method="POST">
     <input type="datetime-local" name="date" value="{{ .DateTimeInputValue }}" />
@@ -26,8 +26,8 @@
     </select>
 
     <select name="status">
-      <option>On</option>
-      <option>Off</option>
+      <option value="1" {{ selected .Enabled }}>Enabled</option>
+      <option value="0" {{ selected .Disabled }}>Disabled</option>
     </select>
 
     <input type="submit" />

@@ -38,14 +38,18 @@ func init() {
 		))
 
 	templates["editSchedule"] = template.Must(
-		template.Must(templates["base"].Clone()).ParseFiles(
+		template.Must(
+			templates["base"].Clone()).Funcs(
+			template.FuncMap{
+				"selected": helpers.Selected,
+			}).ParseFiles(
 			"views/schedules/edit.html",
 		))
 }
 
 func homepage(w http.ResponseWriter, r *http.Request) {
 	err := templates["home"].Execute(w, map[string]interface{}{
-		"Relays": Valves(),
+		"Valves": Valves(),
 	})
 
 	if err != nil {
@@ -138,9 +142,7 @@ func updateSchedule(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 	}
 
-	if err != nil {
-		log.Println(err)
-	}
+	schedule.SetActive(r.PostFormValue("status"))
 
 	db.Orm().Update(schedule)
 

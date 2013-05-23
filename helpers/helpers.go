@@ -11,3 +11,10 @@ func Int32ValueFrom(value string, defaultValue int32) int32 {
 	}
 	return int32(parsed)
 }
+
+func Selected(value bool) string {
+	if value == true {
+		return "selected"
+	}
+	return ""
+}

@@ -1,0 +1,81 @@
+@font-face {
+  font-family: "Parchment";
+  src: url("/assets/fonts/ParchmentMF.ttf");
+}
+
+body {
+    background: #E8E2CD;
+    color: #736C57;
+}
+
+a {
+  color: #736C57;
+}
+
+a.colored {
+  color: #6E819A;
+}
+
+h1 {
+  text-align: center;
+  font-family: "Parchment";
+  font-size: 4.5em;
+  position: relative;
+}
+
+h1 a {
+  text-decoration: none;
+}
+
+h1 a.manual, h1 a.new.schedule {
+  font-family: "Helvetica";
+  font-size: 1.0rem;
+  text-decoration: underline;
+  position: absolute;
+  top: 24px;
+}
+
+h1 .manual {
+  left: 10%;
+}
+
+h1 .new.schedule {
+  right: 10%;
+}
+
+ul {
+    list-style-type: none;
+}
+
+ul.valves {
+  width: 90%;
+  margin: 0 5%;
+  border-radius: 4px;
+  border-bottom: 1px solid #FFF;
+  background: #E8E0C6;
+  box-shadow: 0 -1px 0 1px #888;
+  padding: 0;
+}
+
+li {
+  padding: 12px 24px;
+  border-bottom: 1px solid #D5CDB9;
+}
+
+li h3 {
+  position: relative;
+  font-size: 2.0em;
+  margin: 0 0 1.0em 0;
+}
+
+li h3 a.rename {
+  position: absolute;
+  right: 0;
+  top: 10px;
+  font-size: 1.2rem;
+}
+
+li:last-child {
+  border-bottom: none;
+}
+

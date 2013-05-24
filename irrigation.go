@@ -62,6 +62,7 @@ func launchServer() {
 	r.Post("/valves/{valveId}", updateValve)
 	r.Get("/valves/{valveId}", showValve)
 
+  r.Get("/manual", manual)
 	r.Get("/", homepage)
 
 	http.Handle("/", r)

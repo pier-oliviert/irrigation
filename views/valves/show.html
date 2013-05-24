@@ -1,13 +1,19 @@
 {{ define "content" }}
 
   <h1><a href="/">Irrigation</a></h1>
-  <h2>Schedules for {{ .Valve.Title }}<a href="/valves/{{ .Valve.Id }}/edit">Rename</a></h2>
+  <h2>Schedules for {{ .Valve.Title }}</h2>
   
-  {{ range .Schedules }}
-    <p>
-      Starting {{ .DateTimeInputValue }}, will open every {{ .Interval }} for {{ .Length }}
-      <a href="/schedules/{{ .Id }}/edit">Edit</a>
-    </p>
-  {{ end }}
+  <ul class="schedules">
+    
+    {{ range .Schedules }}
+      <li>
+        {{ if .Disabled }}
+          <strong>Disabled. </strong>
+        {{ end }}
+        Starting {{ formatTime .StartTime "Mon Jan 2 15:04:05" }}, this valve will open every {{ .Multiplicator .Interval }} {{ .Denominator .Interval }} for {{ .Multiplicator .Length }} {{ .Denominator .Length }}.
+        <a href="/schedules/{{ .Id }}/edit">Edit</a>
+      </li>
+    {{ end }}
+  </ul>
 {{ end }}
 

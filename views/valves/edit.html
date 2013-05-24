@@ -1,11 +1,13 @@
 {{ define "content" }}
   <h1><a href="/">Irrigation</a></h1>
-  <h2>Rename Valve</h2>
 
   <form action="/valves/{{ .Id }}" method="POST">
+    <h2>Rename {{ .Title }}</h2>
 
-    <input type="text" name="name" />
+    <div class="input">
+      <input type="text" name="name" />
 
-    <input type="submit" value="Modify" />
+      <input type="submit" value="Modify" />
+    </div>
   </form>
 {{ end }}

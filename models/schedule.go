@@ -33,6 +33,10 @@ func (s *Schedule) DateTimeInputValue() string {
 	return time.Unix(s.Start, 0).Format(layout)
 }
 
+func (s *Schedule) StartTime() time.Time {
+  return time.Unix(s.Start, 0)
+}
+
 func (s *Schedule) SetActive(value string) {
 	s.Active = value == "1"
 }
@@ -98,13 +102,13 @@ func (s *Schedule) Denominator(number int64) string {
 	day := 24 * hour
 	week := 7 * day
 	switch {
-	case number > week && number%week == 0:
+	case number >= week && number%week == 0:
 		return "week"
-	case number > day && number%day == 0:
+	case number >= day && number%day == 0:
 		return "day"
-	case number > hour && number%hour == 0:
+	case number >= hour && number%hour == 0:
 		return "hour"
-	case number > minute && number%minute == 0:
+	case number >= minute && number%minute == 0:
 		return "minute"
 	}
 	return "second"

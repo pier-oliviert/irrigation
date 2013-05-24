@@ -2,33 +2,50 @@
 
   <h1><a href="/">Irrigation</a></h1>
 
-  <form action="/schedules/{{ .Id }}" method="POST">
-    <input type="datetime-local" name="date" value="{{ .DateTimeInputValue }}" />
+  <form action="/schedules/{{ .Id }}" class="schedule" method="POST">
+    <h2>Edit schedule</h2>
 
-    <p>Every</p>
-    <input type="text" name="interval[multiplicator]" value="{{ .Multiplicator .Interval }}"/>
-    <select name="interval[denominator]">
-      <option value="second" {{.Selected "second" .Interval }} >Seconds</option>
-      <option value="minute" {{.Selected "minute" .Interval }} >Minutes</option>
-      <option value="hour" {{.Selected "hour" .Interval }} >Hours</option>
-      <option value="day" {{.Selected "day" .Interval }} >Days</option>
-      <option value="week" {{.Selected "week" .Interval }} >Weeks</option>
-    </select>
+    <div class="row">
+      <label for="startDate">Starting at</label>
+      <input type="datetime-local" id="startDate" name="date" value="{{ .DateTimeInputValue }}" />
+    </div>
 
-    <p>For</p>
-    <input type="text" name="length[multiplicator]" value="{{ .Multiplicator .Length }}" />
-    <select name="length[denominator]">
-      <option value="second" {{.Selected "second" .Length }}>Seconds</option>
-      <option value="minute" {{.Selected "minute" .Length }}>Minutes</option>
-      <option value="hour" {{.Selected "hour" .Length }}>Hours</option>
-      <option value="day" {{.Selected "day" .Length }}>Days</option>
-      <option value="week" {{.Selected "week" .Length }}>Weeks</option>
-    </select>
+    <div class="row">
+      <label for="intervalMultiplicator">Every</label>
+      <div class="time input">
+        <input type="text" id="intervalMultiplicator" name="interval[multiplicator]" value="{{ .Multiplicator .Interval }}"/>
+        <select name="interval[denominator]">
+          <option value="second" {{.Selected "second" .Interval }} >Seconds</option>
+          <option value="minute" {{.Selected "minute" .Interval }} >Minutes</option>
+          <option value="hour" {{.Selected "hour" .Interval }} >Hours</option>
+          <option value="day" {{.Selected "day" .Interval }} >Days</option>
+          <option value="week" {{.Selected "week" .Interval }} >Weeks</option>
+        </select>
+      </div>
+    </div>
 
-    <select name="status">
-      <option value="1" {{ selected .Enabled }}>Enabled</option>
-      <option value="0" {{ selected .Disabled }}>Disabled</option>
-    </select>
+    <div class="row">
+      <label for="lengthMultiplicator">For</label>
+      <div class="time input">
+        <input type="text" id="lengthMultiplicator" name="length[multiplicator]" value="{{ .Multiplicator .Length }}" />
+        <select name="length[denominator]">
+          <option value="second" {{.Selected "second" .Length }}>Seconds</option>
+          <option value="minute" {{.Selected "minute" .Length }}>Minutes</option>
+          <option value="hour" {{.Selected "hour" .Length }}>Hours</option>
+          <option value="day" {{.Selected "day" .Length }}>Days</option>
+          <option value="week" {{.Selected "week" .Length }}>Weeks</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row">
+      <label for="status">Status</label>
+
+      <select name="status" id="status">
+        <option value="1" {{ selected .Enabled }}>Enabled</option>
+        <option value="0" {{ selected .Disabled }}>Disabled</option>
+      </select>
+    </div>
 
     <input type="submit" />
 

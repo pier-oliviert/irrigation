@@ -1,35 +1,49 @@
 {{ define "content" }}
   <h1><a href="/">Irrigation</a></h1>
 
-  <h2>Create a schedule</h2>
-  <form action="/schedules" method="POST">
-    <input type="datetime-local" name="date" />
+  <form action="/schedules" class="schedule" method="POST">
+    <h2>Create a schedule</h2>
+    <div class="row">
+      <label for="selectValve">Valve</label>
+      <select name="valve" id="selectValve">
+        {{range .Valves}}
+          <option value="{{ .Id }}">{{ .Title }}</option>
+        {{ end }}
+      </select>
+    </div>
 
-    <select name="valve">
-      {{range .Valves}}
-        <option value="{{ .Id }}">{{ .Title }}</option>
-      {{ end }}
-    </select>
+    <div class="row">
+      <label for="startDate">Starting at</label>
+      <input type="datetime-local" name="date" id="startDate" />
+    </div>
 
-    <p>Every</p>
-    <input type="text" name="interval[multiplicator]" value="0" />
-    <select name="interval[denominator]">
-      <option value="second">Seconds</option>
-      <option value="minute">Minutes</option>
-      <option value="hour">Hours</option>
-      <option value="day">Days</option>
-      <option value="month">Months</option>
-    </select>
+    <div class="row">
+      <label for="intervalMultiplicator">Every</label>
+      <div class="time input">
+        <input type="text" name="interval[multiplicator]" id="intervalMultiplicator" value="0" />
+        <select name="interval[denominator]">
+          <option value="second">Seconds</option>
+          <option value="minute">Minutes</option>
+          <option value="hour">Hours</option>
+          <option value="day">Days</option>
+          <option value="month">Months</option>
+        </select>
+      </div>
+    </div>
 
-    <p>For</p>
-    <input type="text" name="length[multiplicator]" value="0" />
-    <select name="length[denominator]">
-      <option value="second">Seconds</option>
-      <option value="minute">Minutes</option>
-      <option value="hour">Hours</option>
-      <option value="day">Days</option>
-      <option value="month">Months</option>
-    </select>
+    <div class="row">
+      <label for="lengthMultiplicator">For</label>
+      <div class="time input">
+        <input type="text" name="length[multiplicator]" id="lengthMultiplicator" value="0" />
+        <select name="length[denominator]">
+          <option value="second">Seconds</option>
+          <option value="minute">Minutes</option>
+          <option value="hour">Hours</option>
+          <option value="day">Days</option>
+          <option value="month">Months</option>
+        </select>
+      </div>
+    </div>
 
   <input type="submit" />
 

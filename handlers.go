@@ -27,8 +27,16 @@ func init() {
 			"views/home.html",
 		))
 
-	templates["showValve"] = template.Must(
+	templates["manual"] = template.Must(
 		template.Must(templates["base"].Clone()).ParseFiles(
+			"views/manual.html",
+		))
+
+	templates["showValve"] = template.Must(
+		template.Must(templates["base"].Clone()).Funcs(
+      template.FuncMap{
+      "formatTime": helpers.FormatTime,
+    }).ParseFiles(
 			"views/valves/show.html",
 		))
 
@@ -61,6 +69,18 @@ func homepage(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 	return
+}
+
+func manual(w http.ResponseWriter, r *http.Request) {
+
+    err := templates["manual"].Execute(w, map[string]interface{}{
+        "Valves": Valves(),
+    })
+
+    if err != nil {
+      http.Error(w, err.Error(), http.StatusInternalServerError)
+    }
+    return
 }
 
 func createSchedule(w http.ResponseWriter, r *http.Request) {
@@ -257,7 +277,7 @@ func openValve(w http.ResponseWriter, r *http.Request) {
 		valve.Open()
 
 	}
-	http.Redirect(w, r, "/", 302)
+	http.Redirect(w, r, "/manual", 302)
 	return
 }
 
@@ -268,6 +288,6 @@ func closeValve(w http.ResponseWriter, r *http.Request) {
 		valve.Close()
 
 	}
-	http.Redirect(w, r, "/", 302)
+	http.Redirect(w, r, "/manual", 302)
 	return
 }

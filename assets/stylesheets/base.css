@@ -47,7 +47,7 @@ ul {
     list-style-type: none;
 }
 
-ul.valves {
+ul.valves, ul.schedules, form {
   width: 90%;
   margin: 0 5%;
   border-radius: 4px;
@@ -60,6 +60,7 @@ ul.valves {
 li {
   padding: 12px 24px;
   border-bottom: 1px solid #D5CDB9;
+  position: relative;
 }
 
 li h3 {
@@ -79,3 +80,67 @@ li:last-child {
   border-bottom: none;
 }
 
+li.valve a.button {
+  height: 28px;
+  box-sizing: border-box;
+  padding: 4px 8px;
+  position: absolute;
+  right: 12px;
+  top: calc(50% - 14px);
+  top: -webkit-calc(50% - 14px);
+  border: 1px solid #D5CDB9;
+  border-radius: 4px;
+  background: #736C57;
+  box-shadow: 0 -1px 0 0px #FFF, 0 1px 0 0px #aaa;
+  color: #E8E2CD;
+  text-decoration: none;
+}
+
+li.valve a.button:active {
+  box-shadow: none;
+}
+
+form h2 {
+  padding: 12px;
+  text-align: center;
+}
+
+form > .input {
+  margin: 0 10% 32px 10%;
+  text-align: center;
+}
+form > .input > input[type=text] {
+  width: 50%;
+  font-size: 1.1em;
+  line-height: 1.3em;
+}
+
+form.schedule {
+  box-sizing: border-box;
+  padding: 0 24px;
+}
+
+form.schedule .time.input {
+  border: 1px inset rgb(238,238,238);
+  background: #FFF;
+  height: 1.3em;
+  display: inline-block;
+}
+
+form.schedule div.row label {
+  width: 50%;
+  text-align: right;
+  padding: 0 24px 1.4em 0;
+  display: inline-block;
+}
+
+form.schedule div.row .time.input input[type=text] {
+  border: none;
+  outline: none;
+  background: none;
+}
+
+form.schedule input[type=submit] {
+  width: 90%;
+  margin: 2% 5%;
+}

@@ -1,0 +1,21 @@
+{{ define "content" }}
+<h1>
+  <a href="/">Irrigation</a>
+</h1>
+
+  <ul class="valves">
+    {{ range .Valves }}
+      <li class="valve">
+        <h3>
+          <a href="/valves/{{ .Id }}">{{ .Title }}</a>
+        </h3>
+        {{ if .IsOpened }}
+          <a href="/valves/{{ .Id }}/close" class="button close">Close valve</a>
+        {{ else }}
+          <a href="/valves/{{ .Id }}/open" class="button open">Open valve</a>
+        {{ end }}
+      </li>
+    {{ end }}
+  </ul>
+{{ end }}
+

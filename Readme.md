@@ -3,6 +3,7 @@
 Irrigation is a Go web application that allows you to control your landscaping irrigation valve via a raspberry Pi.
 
 ## Screenshots
+![Irrigation](http://f.cl.ly/items/302d441S2P2a2R0F3Y1s/Screen%20Shot%202013-05-24%20at%201.45.59%20PM.png)
 
 ## Installation
 

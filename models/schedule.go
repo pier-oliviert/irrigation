@@ -34,7 +34,7 @@ func (s *Schedule) DateTimeInputValue() string {
 }
 
 func (s *Schedule) StartTime() time.Time {
-  return time.Unix(s.Start, 0)
+	return time.Unix(s.Start, 0)
 }
 
 func (s *Schedule) SetActive(value string) {

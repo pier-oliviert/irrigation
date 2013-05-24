@@ -34,9 +34,9 @@ func init() {
 
 	templates["showValve"] = template.Must(
 		template.Must(templates["base"].Clone()).Funcs(
-      template.FuncMap{
-      "formatTime": helpers.FormatTime,
-    }).ParseFiles(
+			template.FuncMap{
+				"formatTime": helpers.FormatTime,
+			}).ParseFiles(
 			"views/valves/show.html",
 		))
 
@@ -73,14 +73,14 @@ func homepage(w http.ResponseWriter, r *http.Request) {
 
 func manual(w http.ResponseWriter, r *http.Request) {
 
-    err := templates["manual"].Execute(w, map[string]interface{}{
-        "Valves": Valves(),
-    })
+	err := templates["manual"].Execute(w, map[string]interface{}{
+		"Valves": Valves(),
+	})
 
-    if err != nil {
-      http.Error(w, err.Error(), http.StatusInternalServerError)
-    }
-    return
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	return
 }
 
 func createSchedule(w http.ResponseWriter, r *http.Request) {

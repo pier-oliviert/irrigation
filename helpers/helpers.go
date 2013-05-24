@@ -2,7 +2,7 @@ package helpers
 
 import (
 	"strconv"
-  "time"
+	"time"
 )
 
 func Int32ValueFrom(value string, defaultValue int32) int32 {
@@ -21,5 +21,5 @@ func Selected(value bool) string {
 }
 
 func FormatTime(datetime time.Time, format string) string {
-  return datetime.Format(format)
+	return datetime.Format(format)
 }

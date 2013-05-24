@@ -5,6 +5,7 @@ import (
 	"github.com/coopernurse/gorp"
 	_ "github.com/mattn/go-sqlite3"
 	"log"
+	"os"
 	"strings"
 )
 
@@ -16,11 +17,12 @@ func Orm() *gorp.DbMap {
 
 func Init(env string) {
 	var dbPath []string
+	gopath := os.Getenv("GOPATH")
 
 	if env == "production" {
-		dbPath = []string{"db/irrigation", ".db"}
+		dbPath = []string{gopath, "/assets/irrigation/", "irrigation", ".db"}
 	} else {
-		dbPath = []string{"db/irrigation", "_", env, ".db"}
+		dbPath = []string{"irrigation", "_", env, ".db"}
 	}
 
 	database, err := sql.Open("sqlite3", strings.Join(dbPath, ""))

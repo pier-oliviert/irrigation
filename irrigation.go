@@ -14,7 +14,10 @@ import (
 	"strings"
 )
 
+var Path string
+
 func main() {
+	Path = os.Getenv("GOPATH")
 	db.Init("production")
 	models.RegisterEntry()
 	models.RegisterValve()
@@ -42,12 +45,12 @@ func actionFlag(flag *flag.Flag) {
 }
 
 func launchServer() {
-	configPath := []string{"config", ".yml"}
+	configPath := []string{Path, "/assets/irrigation/config", ".yml"}
 	config.ReadConfigFile(strings.Join(configPath, ""))
 
 	scheduler.Run()
 
-	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
+	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir(Path+"/assets/irrigation/assets"))))
 
 	r := pat.New()
 

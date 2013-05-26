@@ -2,7 +2,7 @@ package models
 
 import (
 	"github.com/coopernurse/gorp"
-	"irrigation/db"
+	"github.com/pothibo/irrigation/db"
 	"log"
 	"time"
 )

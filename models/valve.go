@@ -1,8 +1,8 @@
 package models
 
 import (
-	"gopi"
-	"irrigation/db"
+	"github.com/pothibo/gopi"
+	"github.com/pothibo/irrigation/db"
 	"log"
 	"strconv"
 )

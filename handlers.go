@@ -2,9 +2,9 @@ package main
 
 import (
 	"html/template"
-	"irrigation/db"
-	"irrigation/helpers"
-	"irrigation/models"
+	"github.com/pothibo/irrigation/db"
+	"github.com/pothibo/irrigation/helpers"
+	"github.com/pothibo/irrigation/models"
 	"log"
 	"net/http"
 	"os"

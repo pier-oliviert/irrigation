@@ -7,9 +7,9 @@ import (
 	"testing"
 	"time"
 
-	"irrigation/db"
-	"irrigation/models"
-	"irrigation/scheduler"
+	"github.com/pothibo/irrigation/db"
+	"github.com/pothibo/irrigation/models"
+	"github.com/pothibo/irrigation/scheduler"
 )
 
 func TestStart(t *testing.T) {

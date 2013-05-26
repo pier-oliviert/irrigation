@@ -1,8 +1,8 @@
 package scheduler
 
 import (
-	"irrigation/db"
-	"irrigation/models"
+	"github.com/pothibo/irrigation/db"
+	"github.com/pothibo/irrigation/models"
 	"log"
 	"time"
 )

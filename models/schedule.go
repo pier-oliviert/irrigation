@@ -2,7 +2,7 @@ package models
 
 import (
 	"errors"
-	"irrigation/db"
+	"github.com/pothibo/irrigation/db"
 	"strconv"
 	"time"
 )

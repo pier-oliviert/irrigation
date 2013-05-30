@@ -24,6 +24,7 @@ func main() {
 	models.RegisterSchedule()
 	flag.Bool("server", true, "Start the server")
 	flag.Bool("initdb", true, "Initialize the database.")
+	flag.Bool("activate", true, "Activate the relays.")
 
 	flag.Parse()
 	flag.Visit(actionFlag)
@@ -34,17 +35,21 @@ func main() {
 func actionFlag(flag *flag.Flag) {
 	switch {
 	case flag.Name == "server":
-		launchServer()
+      err := launchServer()
+      if err != nil {
+          log.Panicln(err)
+          os.Exit(1)
+      }
 	case flag.Name == "initdb":
 		err := db.Create()
 		if err != nil {
-			log.Fatalln(err)
+			log.Panicln(err)
 		}
 		os.Exit(1)
 	}
 }
 
-func launchServer() {
+func launchServer() error {
 	configPath := []string{Path, "/assets/irrigation/config", ".yml"}
 	config.ReadConfigFile(strings.Join(configPath, ""))
 
@@ -72,10 +77,7 @@ func launchServer() {
 
   err := http.ListenAndServe(":7777", nil)
   
-  if err != nil {
-      log.Panicln(err)
-      return
-  }
+  return err
 
 }
 

@@ -70,7 +70,12 @@ func launchServer() {
 
 	http.Handle("/", r)
 
-	http.ListenAndServe(":7777", nil)
+  err := http.ListenAndServe(":7777", nil)
+  
+  if err != nil {
+      log.Panicln(err)
+      return
+  }
 
 }
 

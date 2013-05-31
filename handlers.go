@@ -1,10 +1,10 @@
 package main
 
 import (
-	"html/template"
 	"github.com/pothibo/irrigation/db"
 	"github.com/pothibo/irrigation/helpers"
 	"github.com/pothibo/irrigation/models"
+	"html/template"
 	"log"
 	"net/http"
 	"strconv"

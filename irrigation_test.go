@@ -1,7 +1,6 @@
 package main
 
 import (
-	_ "github.com/astaxie/beedb"
 	_ "github.com/mattn/go-sqlite3"
 	"os"
 	"testing"

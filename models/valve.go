@@ -1,8 +1,8 @@
 package models
 
 import (
-	"github.com/pothibo/irrigation/gpio"
 	"github.com/pothibo/irrigation/db"
+	"github.com/pothibo/irrigation/gpio"
 	"log"
 	"strconv"
 )
@@ -14,11 +14,11 @@ type Valve struct {
 }
 
 func (v *Valve) IsOpened() bool {
-    opened, err := gpio.IsOpened(v.RelayId)
-    if err != nil {
-        log.Fatalln(err)
-    }
-    return opened
+	opened, err := gpio.IsOpened(v.RelayId)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	return opened
 }
 
 func (v *Valve) Title() string {

@@ -16,14 +16,14 @@ func Init(path string) error {
 
 	database, err := sql.Open("sqlite3", path)
 	if err != nil {
-      return err
+		return err
 	}
 
 	orm = &gorp.DbMap{
 		Db:      database,
 		Dialect: gorp.SqliteDialect{},
 	}
-  return nil
+	return nil
 
 }
 

@@ -45,3 +45,5 @@ $ sudo ./irrigation -activate
 ./irrigation -server
 ```
 
+## License
+[MIT](http://pothibo.mit-license.org)

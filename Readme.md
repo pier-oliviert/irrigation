@@ -5,33 +5,43 @@ Irrigation is a Go web application that allows you to control your landscaping i
 ## Screenshots
 ![Irrigation](http://f.cl.ly/items/302d441S2P2a2R0F3Y1s/Screen%20Shot%202013-05-24%20at%201.45.59%20PM.png)
 
+## Dependencies
+
+Change pacman -Sy by your package manager
+
+```bash
+sudo pacman -Sy bzr sqlites3 go git pkg-config gcc
+```
+
 ## Installation
 
 This installation assumes you know a bit about linux and you are running Arch Linux ARM. To get started you need to install Go 1.1. Install instruction can be found (http://golang.org/doc/install)[here].
 
-Once installed, make sure you have added a $GOPATH environment variable. Then go to your $GOPATH and fetch this project and its dependencies.
 ```bash
-$ cd $GOPATH/
+$ export GOPATH=~/go
+$ cd $GOPATH
 $ go get github.com/pothibo/irrigation
-$ cd src/github.com/pothibo/irrigation
-$ go get ./..
 ```
 
-Installation for this project is done in 2 steps. First, we want to copy all the assets so they will be available to the executable and then we want to build & install the server's executable.
+Create a folder ```/srv/http/irrigation``` and symlink assets/ folder and config.yml:
 
 ```bash
-$ ./assets.sh && go install
+sudo mkdir /srv/http/irrigation && sudo chown your_user /srv/http/irrigation && sudo chgrp http /srv/http/irrigation
+ln -s $GOPATH/src/github.com/pothibo/irrigation/assets/ /srv/http/irrigation/assets
+ln -s $GOPATH/src/github.com/pothibo/irrigation/config.yml /srv/http/irrigation/config.yml
 ```
 
-I assume you don't have $GOPATH in your path. Let's go to $GOPATH/bin folder and initialize the server.
+Activate the relays first (_root_ privileges needed)
 
 ```bash
 $ cd $GOPATH/bin
-$ ./irrigation -initdb
-```
+# Activate the relay based on config.yml
+$ sudo ./irrigation -activate
 
-Now your server should be configured and ready to go. Start the webserver and access it through raspberryPi_IP:7777:
-```bash
-$ ./irrigation -server
+# Initialize Sqlite database
+./irrigation -initdb
+
+#Run the server
+./irrigation -server
 ```
 

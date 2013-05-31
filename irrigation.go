@@ -18,7 +18,7 @@ import (
 var configFile string
 
 func init() {
-	flag.Bool("server", true, "Start the server")
+	flag.Bool("server", true, "Start the server with port: 7777")
 	flag.Bool("initdb", true, "Initialize the database.")
 	flag.Bool("activate", true, "Activate the relays.")
 	flag.Bool("help", true, "Show this help menu.")

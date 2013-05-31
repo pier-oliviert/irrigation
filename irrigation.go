@@ -1,9 +1,11 @@
 package main
 
 import (
+    "errors"
 	"flag"
 	"github.com/globocom/config"
 	"github.com/gorilla/pat"
+	"github.com/pothibo/irrigation/gpio"
 	"github.com/pothibo/irrigation/db"
 	"github.com/pothibo/irrigation/models"
 	"github.com/pothibo/irrigation/scheduler"
@@ -11,20 +13,28 @@ import (
 	"net/http"
 	"os"
 	"strconv"
-	"strings"
 )
+var configFile string
 
-var Path string
-
-func main() {
-	Path = os.Getenv("GOPATH")
-	db.Init("production")
-	models.RegisterEntry()
-	models.RegisterValve()
-	models.RegisterSchedule()
+func init() {
 	flag.Bool("server", true, "Start the server")
 	flag.Bool("initdb", true, "Initialize the database.")
 	flag.Bool("activate", true, "Activate the relays.")
+	flag.Bool("help", true, "Show this help menu.")
+  flag.StringVar(&configFile, "c", "/srv/http/irrigation/config.yml", "Configuration file")
+}
+
+func main() {
+    config.ReadConfigFile(configFile)
+    path, err := config.GetString("database")
+    if err != nil {
+        log.Panicln("No database file specified in config file.");
+        os.Exit(1)
+    }
+	db.Init(path)
+	models.RegisterEntry()
+	models.RegisterValve()
+	models.RegisterSchedule()
 
 	flag.Parse()
 	flag.Visit(actionFlag)
@@ -35,7 +45,7 @@ func main() {
 func actionFlag(flag *flag.Flag) {
 	switch {
 	case flag.Name == "server":
-      err := launchServer()
+      err := launchServer(flag)
       if err != nil {
           log.Panicln(err)
           os.Exit(1)
@@ -46,16 +56,25 @@ func actionFlag(flag *flag.Flag) {
 			log.Panicln(err)
 		}
 		os.Exit(1)
+
+  case flag.Name == "activate":
+      err := activateRelay()
+      if err != nil {
+          log.Fatalln(err)
+      }
+      os.Exit(1)
 	}
 }
 
-func launchServer() error {
-	configPath := []string{Path, "/assets/irrigation/config", ".yml"}
-	config.ReadConfigFile(strings.Join(configPath, ""))
+func launchServer(flag *flag.Flag) error {
+    path, err := config.GetString("assets")
+    if err != nil {
+        return errors.New("No assets folder specified in config file.")
+    }
 
 	scheduler.Run()
 
-	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir(Path+"/assets/irrigation/assets"))))
+	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir(path))))
 
 	r := pat.New()
 
@@ -75,10 +94,22 @@ func launchServer() error {
 
 	http.Handle("/", r)
 
-  err := http.ListenAndServe(":7777", nil)
+  initializeTemplates(path)
+
+  err = http.ListenAndServe(":7777", nil)
   
   return err
 
+}
+
+func activateRelay() error {
+    for _, valve := range Valves() {
+        err := gpio.Activate(valve.RelayId)
+        if err != nil {
+            return err
+        }
+    }
+    return nil
 }
 
 func Valves() map[int]*models.Valve {
@@ -92,7 +123,7 @@ func Valves() map[int]*models.Valve {
 	for _, value := range valves {
 		valve, err := strconv.Atoi(value)
 		if err != nil {
-			log.Panicf("Valve %s could not be configured. Ignoring")
+			log.Printf("Valve %s could not be configured. Ignoring")
 		}
 		relays[valve] = models.FirstValveOrCreate(valve)
 	}

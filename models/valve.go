@@ -1,7 +1,7 @@
 package models
 
 import (
-	"github.com/pothibo/gopi"
+	"github.com/pothibo/irrigation/gpio"
 	"github.com/pothibo/irrigation/db"
 	"log"
 	"strconv"
@@ -14,7 +14,11 @@ type Valve struct {
 }
 
 func (v *Valve) IsOpened() bool {
-	return gopi.Opened(v.RelayId)
+    opened, err := gpio.IsOpened(v.RelayId)
+    if err != nil {
+        log.Fatalln(err)
+    }
+    return opened
 }
 
 func (v *Valve) Title() string {
@@ -44,11 +48,11 @@ func (v *Valve) Schedules() []*Schedule {
 }
 
 func (v *Valve) Open() {
-	gopi.Open(v.RelayId)
+	gpio.Open(v.RelayId)
 }
 
 func (v *Valve) Close() {
-	gopi.Close(v.RelayId)
+	gpio.Close(v.RelayId)
 }
 
 func FirstValveOrCreate(relay int) *Valve {

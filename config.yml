@@ -1,3 +1,6 @@
 valves: [4, 17, 27, 22, 18, 23]
 pump: []
 
+assets: "/srv/http/irrigation/assets"
+database: "/srv/http/irrigation/config.yml"
+

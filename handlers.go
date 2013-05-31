@@ -7,31 +7,29 @@ import (
 	"github.com/pothibo/irrigation/models"
 	"log"
 	"net/http"
-	"os"
 	"strconv"
 )
 
 var templates = map[string]*template.Template{}
 
-func init() {
-	goPath := os.Getenv("GOPATH")
+func initializeTemplates(path string) {
 	templates["base"] = template.Must(template.ParseFiles(
-		goPath + "/assets/irrigation/views/_base.html",
+		path + "/views/_base.html",
 	))
 
 	templates["error"] = template.Must(
 		template.Must(templates["base"].Clone()).ParseFiles(
-			goPath + "/assets/irrigation/views/error.html",
+			path + "/views/error.html",
 		))
 
 	templates["home"] = template.Must(
 		template.Must(templates["base"].Clone()).ParseFiles(
-			goPath + "/assets/irrigation/views/home.html",
+			path + "/views/home.html",
 		))
 
 	templates["manual"] = template.Must(
 		template.Must(templates["base"].Clone()).ParseFiles(
-			goPath + "/assets/irrigation/views/manual.html",
+			path + "/views/manual.html",
 		))
 
 	templates["showValve"] = template.Must(
@@ -39,17 +37,17 @@ func init() {
 			template.FuncMap{
 				"formatTime": helpers.FormatTime,
 			}).ParseFiles(
-			goPath + "/assets/irrigation/views/valves/show.html",
+			path + "/views/valves/show.html",
 		))
 
 	templates["editValve"] = template.Must(
 		template.Must(templates["base"].Clone()).ParseFiles(
-			goPath + "/assets/irrigation/views/valves/edit.html",
+			path + "/views/valves/edit.html",
 		))
 
 	templates["newSchedule"] = template.Must(
 		template.Must(templates["base"].Clone()).ParseFiles(
-			goPath + "/assets/irrigation/views/schedules/new.html",
+			path + "/views/schedules/new.html",
 		))
 
 	templates["editSchedule"] = template.Must(
@@ -58,7 +56,7 @@ func init() {
 			template.FuncMap{
 				"selected": helpers.Selected,
 			}).ParseFiles(
-			goPath + "/assets/irrigation/views/schedules/edit.html",
+			path + "/views/schedules/edit.html",
 		))
 }
 

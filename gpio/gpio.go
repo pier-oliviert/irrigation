@@ -87,7 +87,8 @@ func export(relay int) error {
 
 	_, err = file.WriteString(strconv.Itoa(relay))
 
-	return err
+
+  return err
 }
 
 func setRelayAsOutput(relay int) error {
@@ -102,7 +103,12 @@ func setRelayAsOutput(relay int) error {
 
 	_, err = file.WriteString("out")
 
-	return makeValueAvailable(path + "/value")
+	err = makeValueAvailable(path + "/value")
+  if err != nil {
+      return err
+  }
+
+  return Close(relay)
 
 }
 

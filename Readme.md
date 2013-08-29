@@ -15,7 +15,7 @@ sudo pacman -Sy bzr sqlites3 go git pkg-config gcc
 
 ## Installation
 
-This installation assumes you know a bit about linux and you are running Arch Linux ARM. To get started you need to install Go 1.1. Install instruction can be found (http://golang.org/doc/install)[here].
+This installation assumes you know a bit about linux and you are running Arch Linux ARM. To get started you need to install Go 1.1. Install instruction can be found [here](http://golang.org/doc/install).
 
 ```bash
 $ export GOPATH=~/go

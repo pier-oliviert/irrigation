@@ -1,7 +1,7 @@
 package main
 
 import (
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/go-sql-driver/mysql"
 	"os"
 	"testing"
 	"time"
@@ -12,7 +12,7 @@ import (
 )
 
 func TestStart(t *testing.T) {
-	db.Init("test")
+  db.Init("test:test12345@/irrigationtest")
 	models.RegisterEntry()
 	models.RegisterValve()
 	models.RegisterSchedule()

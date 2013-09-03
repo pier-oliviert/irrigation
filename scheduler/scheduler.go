@@ -56,7 +56,7 @@ func scheduledToLaunch() []*models.Schedule {
 	query := "select *" +
 		"from schedules s " +
 		"where s.Active = 1 and " +
-		"( s.Start = ? OR ( (strftime('%s', 'now') - strftime(s.Start)) % s.Interval) = 0)"
+		"( s.Start = ? OR ( (unix_timestamp() - from_unixtime(s.Start)) % s.Interval) = 0)"
 	instances, err := db.Orm().Select(models.Schedule{}, query, active_at)
 
 	if err != nil {

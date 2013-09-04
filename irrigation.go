@@ -1,9 +1,8 @@
 package main
 
 import (
-	"errors"
 	"flag"
-	"github.com/globocom/config"
+	"github.com/pothibo/irrigation/config"
 	"github.com/gorilla/pat"
 	"github.com/pothibo/irrigation/db"
 	"github.com/pothibo/irrigation/gpio"
@@ -12,31 +11,28 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strconv"
+	"os/user"
+  "fmt"
 )
 
-var configFile string
+var path string
+var cfg *config.Config
 
 func init() {
+  usr, err := user.Current()
+  if err != nil {
+    log.Fatalln(fmt.Sprintf(`There was a problem retrieving the current user.
+      Error: %v`, err))
+  }
+
 	flag.Bool("server", true, "Start the server with port: 7777")
-	flag.Bool("initdb", true, "Initialize the database.")
+	flag.Bool("initialize", true, "Initialize the server. Doing this will reset everything to defaults, database included.")
 	flag.Bool("activate", true, "Activate the relays.")
 	flag.Bool("help", true, "Show this help menu.")
-	flag.StringVar(&configFile, "c", "/srv/http/irrigation/config.yml", "Configuration file")
+	flag.StringVar(&path, "path", fmt.Sprintf("%v/irrigation",usr.HomeDir), "Path where your config & HTML files will be located.")
 }
 
 func main() {
-	config.ReadConfigFile(configFile)
-	path, err := config.GetString("database")
-	if err != nil {
-		log.Panicln("No database file specified in config file.")
-		os.Exit(1)
-	}
-	db.Init(path)
-	models.RegisterEntry()
-	models.RegisterValve()
-	models.RegisterSchedule()
-
 	flag.Parse()
 	flag.Visit(actionFlag)
 
@@ -46,19 +42,59 @@ func main() {
 func actionFlag(flag *flag.Flag) {
 	switch {
 	case flag.Name == "server":
+    cfg = config.Init(path)
+    db.ConfigureWith(cfg)
+    db.Init()
+    models.RegisterEntry()
+    models.RegisterValve()
+    models.RegisterSchedule()
 		err := launchServer(flag)
 		if err != nil {
 			log.Panicln(err)
 			os.Exit(1)
 		}
-	case flag.Name == "initdb":
-		err := db.Create()
+	case flag.Name == "initialize":
+    fetchRepository(path)
+    cfg = config.Init(path)
+
+    database := cfg.Database
+    var mysqlRootPassword string
+
+    fmt.Println("Your root password for MySQL:")
+    fmt.Scanln(&mysqlRootPassword)
+
+    fmt.Println(fmt.Sprintf("User MySQL? (default: %v)", database["user"]))
+    setValueFor("user", database)
+
+    fmt.Println(fmt.Sprintf("User password for MySQL? (default: %v)", database["password"]))
+    setValueFor("password", database)
+
+    fmt.Println(fmt.Sprintf("MySQL Database name? (default: %v)", database["name"]))
+    setValueFor("name", database)
+
+    cfg.SetDatabase(database)
+
+    db.ConfigureWith(cfg)
+    db.InitializeDatabase(mysqlRootPassword)
+    db.Init()
+    models.RegisterEntry()
+    models.RegisterValve()
+    models.RegisterSchedule()
+    err := db.Create()
 		if err != nil {
 			log.Panicln(err)
 		}
+    fmt.Println(fmt.Sprintf(`Configuration of Irrigation is finished!
+    You can now start the server
+    $ irrigation -server
+    If you want to modify your current configuration, you can do so by modifying
+    %v/config.yml
+    Enjoy!
+    @pothibo`, path))
 		os.Exit(1)
 
 	case flag.Name == "activate":
+    cfg = config.Init(path)
 		err := activateRelay()
 		if err != nil {
 			log.Fatalln(err)
@@ -68,14 +104,12 @@ func actionFlag(flag *flag.Flag) {
 }
 
 func launchServer(flag *flag.Flag) error {
-	path, err := config.GetString("assets")
-	if err != nil {
-		return errors.New("No assets folder specified in config file.")
-	}
-
 	scheduler.Run()
 
-	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir(path))))
+  stylesheets := fmt.Sprintf("%v/stylesheets/", path)
+  javascripts := fmt.Sprintf("%v/javascripts/", path)
+	http.Handle("/stylesheets/", http.StripPrefix("/stylesheets/", http.FileServer(http.Dir(stylesheets))))
+	http.Handle("/javascripts/", http.StripPrefix("/javascripts/", http.FileServer(http.Dir(javascripts))))
 
 	r := pat.New()
 
@@ -96,11 +130,8 @@ func launchServer(flag *flag.Flag) error {
 	http.Handle("/", r)
 
 	initializeTemplates(path)
-
-	err = http.ListenAndServe(":7777", nil)
-
+  err := http.ListenAndServe(fmt.Sprintf(":%v", cfg.Port), nil)
 	return err
-
 }
 
 func activateRelay() error {
@@ -113,19 +144,11 @@ func activateRelay() error {
 	return nil
 }
 
-func Valves() map[int]*models.Valve {
-	relays := make(map[int]*models.Valve)
+func Valves() map[uint8]*models.Valve {
+	relays := make(map[uint8]*models.Valve)
 
-	valves, err := config.GetList("valves")
-	if err != nil {
-		log.Fatalf("Could not load the valves id: %v", err)
-	}
 
-	for _, value := range valves {
-		valve, err := strconv.Atoi(value)
-		if err != nil {
-			log.Printf("Valve %s could not be configured. Ignoring")
-		}
+	for _, valve := range cfg.Valves {
 		relays[valve] = models.FirstValveOrCreate(valve)
 	}
 

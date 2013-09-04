@@ -1,5 +1,0 @@
-valves: [14, 15, 18, 23, 24, 4, 17, 22]
-
-assets: "/srv/http/irrigation/assets"
-database: "/srv/http/irrigation/irrigation.db"
-

@@ -9,7 +9,7 @@ import (
 
 type Valve struct {
 	Id      int32
-	RelayId int
+	RelayId uint8
 	Name    string
 }
 
@@ -55,7 +55,7 @@ func (v *Valve) Close() {
 	gpio.Close(v.RelayId)
 }
 
-func FirstValveOrCreate(relay int) *Valve {
+func FirstValveOrCreate(relay uint8) *Valve {
 	var valve *Valve
 	query := "select v.Id, v.RelayId, v.Name " +
 		"from valves v " +
@@ -79,7 +79,7 @@ func FirstValveOrCreate(relay int) *Valve {
 	return valve
 }
 
-func GetValveByRelayId(id int) (valve *Valve, err error) {
+func GetValveByRelayId(id uint8) (valve *Valve, err error) {
 	query := "select v.Id, v.RelayId, v.Name " +
 		"from valves v " +
 		"where v.RelayId = ?"

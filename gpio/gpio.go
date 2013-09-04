@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-func Open(relay int) error {
+func Open(relay uint8) error {
 	path := fmt.Sprintf("/sys/class/gpio/gpio%d/value", relay)
 	file, err := os.OpenFile(path, os.O_WRONLY|os.O_APPEND, os.ModeDevice)
 	if err != nil {
@@ -21,7 +21,7 @@ func Open(relay int) error {
 	return err
 }
 
-func Close(relay int) error {
+func Close(relay uint8) error {
 	path := fmt.Sprintf("/sys/class/gpio/gpio%d/value", relay)
 	file, err := os.OpenFile(path, os.O_WRONLY|os.O_APPEND, os.ModeDevice)
 	if err != nil {
@@ -35,7 +35,7 @@ func Close(relay int) error {
 	return err
 }
 
-func IsOpened(relay int) (opened bool, err error) {
+func IsOpened(relay uint8) (opened bool, err error) {
 	path := fmt.Sprintf("/sys/class/gpio/gpio%d/value", relay)
 	file, err := os.OpenFile(path, os.O_RDONLY, os.ModeDevice)
 	if err != nil {
@@ -54,12 +54,12 @@ func IsOpened(relay int) (opened bool, err error) {
 	return string(data) == "0", nil
 }
 
-func IsClosed(relay int) (opened bool, err error) {
+func IsClosed(relay uint8) (opened bool, err error) {
 	opened, err = IsOpened(relay)
 	return !opened, err
 }
 
-func Activate(relay int) error {
+func Activate(relay uint8) error {
 	if os.Getuid() != 0 {
 		return errors.New("You have to be root to activate relays")
 	}
@@ -77,7 +77,7 @@ func Activate(relay int) error {
 	return nil
 }
 
-func export(relay int) error {
+func export(relay uint8) error {
 	file, err := os.OpenFile("/sys/class/gpio/export", os.O_WRONLY|os.O_APPEND, os.ModeDevice)
 	if err != nil {
 		return err
@@ -85,13 +85,13 @@ func export(relay int) error {
 
 	defer file.Close()
 
-	_, err = file.WriteString(strconv.Itoa(relay))
+	_, err = file.WriteString(strconv.Itoa(int(relay)))
 
 
   return err
 }
 
-func setRelayAsOutput(relay int) error {
+func setRelayAsOutput(relay uint8) error {
 	path := fmt.Sprintf("/sys/class/gpio/gpio%d", relay)
 
 	file, err := os.OpenFile(path+"/direction", os.O_WRONLY|os.O_APPEND, os.ModeDevice)

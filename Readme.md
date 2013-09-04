@@ -10,8 +10,14 @@ Irrigation is a Go web application that allows you to control your landscaping i
 Change pacman -Sy by your package manager
 
 ```bash
-sudo pacman -Sy bzr sqlites3 go git pkg-config gcc
+sudo pacman -Sy bzr mariadb go git pkg-config gcc
 ```
+
+### MySQL (Mariadb)
+Because SQLite3 is bugged in Go until at least 1.3, I had no choice to move away from it to a MySQL solution. 
+
+When you install mariadb, it will ask you to run ```bash mysql_secure_installation```, do it. Once this is done, you can initialize your irrigation server.
+
 
 ## Installation
 

@@ -9,6 +9,8 @@ import (
 	"github.com/pothibo/irrigation/db"
 	"github.com/pothibo/irrigation/models"
 	"github.com/pothibo/irrigation/scheduler"
+
+  "github.com/globocom/config"
 )
 
 func TestStart(t *testing.T) {
@@ -23,6 +25,11 @@ func TestStart(t *testing.T) {
 		t.Log(err)
 	}
 
+}
+
+func TestDatabaseConnection(t *testing.T) {
+  config.ReadConfigFile("config.yml")
+  startDatabaseConnection(config.Get("database"))
 }
 
 func TestValveCreation(t *testing.T) {

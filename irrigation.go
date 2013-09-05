@@ -53,6 +53,7 @@ func actionFlag(flag *flag.Flag) {
     initialize()
 	case flag.Name == "activate":
     cfg = config.Init(path)
+    initDB(cfg, false)
 		err := activateRelay()
 		if err != nil {
 			log.Fatalln(err)

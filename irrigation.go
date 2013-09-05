@@ -43,56 +43,14 @@ func actionFlag(flag *flag.Flag) {
 	switch {
 	case flag.Name == "server":
     cfg = config.Init(path)
-    db.ConfigureWith(cfg)
-    db.Init()
-    models.RegisterEntry()
-    models.RegisterValve()
-    models.RegisterSchedule()
-		err := launchServer(flag)
+    initDB(cfg, false)
+		err := launchServer()
 		if err != nil {
 			log.Panicln(err)
 			os.Exit(1)
 		}
 	case flag.Name == "initialize":
-    fetchRepository(path)
-    cfg = config.Init(path)
-
-    database := cfg.Database
-    var mysqlRootPassword string
-
-    fmt.Println("Your root password for MySQL:")
-    fmt.Scanln(&mysqlRootPassword)
-
-    fmt.Println(fmt.Sprintf("User MySQL? (default: %v)", database["user"]))
-    setValueFor("user", database)
-
-    fmt.Println(fmt.Sprintf("User password for MySQL? (default: %v)", database["password"]))
-    setValueFor("password", database)
-
-    fmt.Println(fmt.Sprintf("MySQL Database name? (default: %v)", database["name"]))
-    setValueFor("name", database)
-
-    cfg.SetDatabase(database)
-
-    db.ConfigureWith(cfg)
-    db.InitializeDatabase(mysqlRootPassword)
-    db.Init()
-    models.RegisterEntry()
-    models.RegisterValve()
-    models.RegisterSchedule()
-    err := db.Create()
-		if err != nil {
-			log.Panicln(err)
-		}
-    fmt.Println(fmt.Sprintf(`Configuration of Irrigation is finished!
-    You can now start the server
-    $ irrigation -server
-    If you want to modify your current configuration, you can do so by modifying
-    %v/config.yml
-    Enjoy!
-    @pothibo`, path))
-		os.Exit(1)
-
+    initialize()
 	case flag.Name == "activate":
     cfg = config.Init(path)
 		err := activateRelay()
@@ -103,7 +61,58 @@ func actionFlag(flag *flag.Flag) {
 	}
 }
 
-func launchServer(flag *flag.Flag) error {
+func initialize() {
+  var mysqlRootPassword string
+  fetchRepository(path)
+  cfg = config.Init(path)
+
+  database := cfg.Database
+
+  msg := fmt.Sprintf("User MySQL? (default: %v)", *database["user"])
+  config.AskForValue(cfg.Database["user"], msg)
+
+  msg = fmt.Sprintf("User password for MySQL? (default: %v)", *database["password"])
+  config.AskForValue(cfg.Database["password"], msg)
+
+  msg = fmt.Sprintf("MySQL Database name? (default: %v)", *database["name"])
+  config.AskForValue(cfg.Database["name"], msg)
+
+  fmt.Println("Your root password for MySQL:")
+  fmt.Scanln(&mysqlRootPassword)
+
+  cfg.Update()
+
+  db.InitializeDatabase(cfg, mysqlRootPassword)
+
+  initDB(cfg, true)
+
+  fmt.Println(fmt.Sprintf(`Configuration of Irrigation is finished!
+  You can now start the server
+  $ irrigation -server
+  If you want to modify your current configuration, you can do so by modifying
+  %v/config.yml
+  Enjoy!
+  @pothibo`, path))
+  os.Exit(1)
+
+}
+
+func initDB(cfg *config.Config, create bool) {
+  db.ConfigureWith(cfg)
+  db.Init()
+  models.RegisterEntry()
+  models.RegisterValve()
+  models.RegisterSchedule()
+
+  if create {
+    err := db.Orm().CreateTablesIfNotExists()
+    if err != nil {
+      log.Fatalln(err)
+    }
+  }
+}
+
+func launchServer() error {
 	scheduler.Run()
 
   stylesheets := fmt.Sprintf("%v/stylesheets/", path)
@@ -130,7 +139,7 @@ func launchServer(flag *flag.Flag) error {
 	http.Handle("/", r)
 
 	initializeTemplates(path)
-  err := http.ListenAndServe(fmt.Sprintf(":%v", cfg.Port), nil)
+  err := http.ListenAndServe(fmt.Sprintf(":%d", cfg.Port), nil)
 	return err
 }
 

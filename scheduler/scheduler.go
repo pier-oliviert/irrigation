@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-var working = true
+var working = false
 
 func Run() {
 	working = true

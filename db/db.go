@@ -23,7 +23,7 @@ func ConfigureWith(c *config.Config) {
 }
 
 func Init() error {
-  path := fmt.Sprintf("%v:%v@/%v", cfg.Database["user"], cfg.Database["password"], cfg.Database["name"])
+  path := fmt.Sprintf("%v:%v@/%v", *cfg.Database["user"], *cfg.Database["password"], *cfg.Database["name"])
 	database, err := sql.Open("mysql", path)
 	if err != nil {
 		return err
@@ -37,23 +37,25 @@ func Init() error {
 	return nil
 }
 
-func Create() error {
-	err := Orm().CreateTablesIfNotExists()
-	return err
-}
-
-func InitializeDatabase(rootPassword string) {
-  name := cfg.Database["name"]
-  user := cfg.Database["user"]
-  password := cfg.Database["password"]
+func InitializeDatabase(config *config.Config, rootPassword string) {
+  name := *config.Database["name"]
+  user := *config.Database["user"]
+  password := *config.Database["password"]
 
   createDatabase(rootPassword, name)
   createUser(rootPassword, user, password, name)
 }
 
 func createDatabase(rootPassword string, name string) {
-  access := fmt.Sprintf("-p%v", rootPassword)
-  sql := fmt.Sprintf(`-e drop database %v; create database %v;`, name, name)
+  var access string
+  if len(rootPassword) > 0 {
+    access = fmt.Sprintf("-p%v", rootPassword)
+  }
+  sql := fmt.Sprintf(`-e 
+  drop database if exists %v; create database %v;
+  drop database if exists %vtest; create database %vtest;
+  `, name, name, name, name)
+
   cmd := exec.Command("mysql", `-uroot`, access, sql)
   out, err := cmd.CombinedOutput()
 
@@ -65,8 +67,15 @@ func createDatabase(rootPassword string, name string) {
 }
 
 func createUser(rootPassword string, user string, password string, name string) {
-  access := fmt.Sprintf("-p%v", rootPassword)
-  sql := fmt.Sprintf("-e grant all on `%v`.* to `%v`@`localhost` identified by '%v'",name, user, password)
+  var access string
+  if len(rootPassword) > 0 {
+    access = fmt.Sprintf("-p%v", rootPassword)
+  }
+  sql := fmt.Sprintf(`-e
+  grant all privileges on %v.* to '%v'@'localhost' identified by '%v';
+  grant all privileges on %vtest.* to '%v'@'localhost' identified by '%v';
+  `,name, user, password, name, user, password)
+
   cmd := exec.Command("mysql", "-uroot", access, sql)
   out, err := cmd.CombinedOutput()
 

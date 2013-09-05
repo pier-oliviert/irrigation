@@ -11,7 +11,7 @@ import(
 type Config struct {
   Port      uint16
   Path      string
-  Database  map[string]string
+  Database  map[string]*string
   Valves    []uint8
 }
 
@@ -31,17 +31,26 @@ func Init(path string) (c *Config) {
   return c
 }
 
-func (c *Config) SetPort(value int) {
-  c.Port = uint16(value)
-  config.Set("port", value)
-  c.update()
+func AskForValue(option interface{}, msg string) {
+  fmt.Println(msg)
+  fmt.Scanln(option)
 }
 
-func (c *Config) SetDatabase(values map[string]string) {
-  c.Database = values
-  config.Set("database", values)
-  c.update()
+func (c *Config) Update() {
+  updateConfigInternal(c)
+  file := fmt.Sprintf("%v/config.yml", c.Path)
+  err := os.Remove(file)
+  if err != nil {
+    log.Fatalln(fmt.Sprintf(`An error occured while updating the configuration file
+    %v`,err))
+  }
+  err = config.WriteConfigFile(file, 0744)
+  if err != nil {
+    log.Fatalln(fmt.Sprintf(`An error occured while updating the configuration file
+    %v`,err))
+  }
 }
+
 
 // Private
 
@@ -63,7 +72,7 @@ port: 7777
 }
 
 func (c *Config) database() {
-  c.Database = map[string]string{}
+  c.Database = map[string]*string{}
   name, err := config.GetString("database:name")
 
 	if err != nil {
@@ -75,19 +84,19 @@ func (c *Config) database() {
      password: 'password'`)
 	}
 
-  c.Database["name"] = name
+  c.Database["name"] = &name
 
   user, err := config.GetString("database:user")
   if err != nil {
     log.Fatalln(`An error happened when fetching the database configuration`)
   }
-  c.Database["user"] = user
+  c.Database["user"] = &user
 
   password, err := config.GetString("database:password")
   if err != nil {
     log.Fatalln(`An error happened when fetching the database configuration`)
   }
-  c.Database["password"] = password
+  c.Database["password"] = &password
 }
 
 func (c *Config) valves() {
@@ -108,16 +117,9 @@ func (c *Config) valves() {
   c.Valves = valves
 }
 
-func (c *Config) update() {
-  file := fmt.Sprintf("%v/config.yml", c.Path)
-  err := os.Remove(file)
-  if err != nil {
-    log.Fatalln(fmt.Sprintf(`An error occured while updating the configuration file
-    %v`,err))
-  }
-  err = config.WriteConfigFile(file, 0744)
-  if err != nil {
-    log.Fatalln(fmt.Sprintf(`An error occured while updating the configuration file
-    %v`,err))
-  }
+func updateConfigInternal(c *Config) {
+  config.Set("port", c.Port)
+  config.Set("database:name", *c.Database["name"])
+  config.Set("database:user", *c.Database["user"])
+  config.Set("database:password", *c.Database["password"])
 }

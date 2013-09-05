@@ -36,12 +36,3 @@ func fetchRepository(path string) {
     Error: %v`, out, err))
   }
 }
-
-func setValueFor(key string, options map[string]string) {
-  value := options[key]
-  fmt.Scanln(&value)
-
-  if len(value) != 0 {
-    options[key] = value
-  }
-}

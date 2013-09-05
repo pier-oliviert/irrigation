@@ -27,29 +27,32 @@ This installation assumes you know a bit about linux and you are running Arch Li
 $ export GOPATH=~/go
 $ cd $GOPATH
 $ go get github.com/pothibo/irrigation
+$ cd $GOPATH/src/github.com/pothibo/irrigation
+$ go build && go install
+$ $GOPATH/bin/irrigation -initialize -path="some/path"
 ```
 
-Create a folder ```/srv/http/irrigation``` and symlink assets/ folder and config.yml:
+The path is where irrigation will install the html, css, js, and config.yml files. These are the files you can modify if you want to
+customize the look & feel of your app. 
+
+By default, it will use ```~/irrigation```
+
+The initialization process requires root access to your database. It will create a user and a two database (one for testing the other one for production).
+
+## Activate your relays (_root_ privileges needed)
 
 ```bash
-sudo mkdir /srv/http/irrigation && sudo chown your_user /srv/http/irrigation && sudo chgrp http /srv/http/irrigation
-ln -s $GOPATH/src/github.com/pothibo/irrigation/assets/ /srv/http/irrigation/assets
-ln -s $GOPATH/src/github.com/pothibo/irrigation/config.yml /srv/http/irrigation/config.yml
+$ $GOPATH/bin/irrigation -activate -path="path/you/specified/above"
 ```
 
-Activate the relays first (_root_ privileges needed)
+## Launch the server
+If everything was successful, you can launch your server
 
 ```bash
-$ cd $GOPATH/bin
-# Activate the relay based on config.yml
-$ sudo ./irrigation -activate
-
-# Initialize Sqlite database
-./irrigation -initdb
-
-#Run the server
-./irrigation -server
+$ $GOPATH/bin/irrigation -server &
 ```
+
+By default, it will be available at ```raspberryPi_ip:7777```
 
 ## License
 [MIT](http://pothibo.mit-license.org)

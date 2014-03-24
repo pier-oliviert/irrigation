@@ -1,7 +1,7 @@
 package config
 
 import(
-	"github.com/globocom/config"
+	"github.com/tsuru/config"
   "fmt"
   "log"
   "os"

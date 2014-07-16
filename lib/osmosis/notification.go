@@ -4,7 +4,6 @@ import (
   "net"
   "strings"
   "strconv"
-  "log"
   )
 
 func notify(connections []net.Conn, cmd *Command) {

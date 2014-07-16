@@ -29,7 +29,7 @@ func NewCommand(infos []string) (*Command, error) {
 func (c *Command) Execute() error {
   if c.name == "open" {
     c.open()
-  } else {
+  } else if c.name == "close" {
     c.close()
   }
   return nil

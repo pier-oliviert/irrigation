@@ -1,0 +1,16 @@
+default: &default
+  adapter: postgresql
+  pool: 5
+  timeout: 5000
+
+development:
+  <<: *default
+  database: irrigation_dev
+
+test:
+  <<: *default
+  database: irrigation_test
+
+production:
+  <<: *default
+  database: irrigation

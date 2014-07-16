@@ -1,0 +1,18 @@
+<h1>Zones</h1>
+
+<ul>
+  <% @zones.each do |zone| %>
+    <li>
+      <%= content_tag :span, zone.name %>
+      <% if zone.sprinkles.active.any? %>
+        <p> Currently working</p>
+        <%= button_to "Close", zone.sprinkles.active.first, method: :delete, remote: true %>
+      <% else %>
+        <%= form_for [zone, zone.sprinkles.build], builder: SprinkleBuilder, remote: true do |f| %>
+          <%= f.duration %>
+          <%= f.submit 'create' %>
+        <% end %>
+      <% end %>
+    </li>
+  <% end %>
+</ul>

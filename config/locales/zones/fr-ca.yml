@@ -1,0 +1,15 @@
+fr-CA:
+  zones:
+
+    onboarding:
+      header: 'Aucune zone configurée :('
+
+    new:
+      header: 'Créer une nouvelle zone'
+
+    form:
+      name: 'Nom de la zone'
+      button: 'Créer!'
+
+    link:
+      new: 'Ajouter une zone'

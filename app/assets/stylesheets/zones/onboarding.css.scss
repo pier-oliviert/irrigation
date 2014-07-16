@@ -1,0 +1,10 @@
+main.zones.index section.onboarding {
+  @include display(flex);
+  @include flex-direction(column);
+  @include flex(1);
+  @include justify-content(center);
+  margin-bottom: 50vh;
+  h1, p {
+    text-align: center;
+  }
+}

@@ -1,0 +1,32 @@
+@import 'bourbon';
+@import 'variables';
+@import 'shared/**/*';
+@import 'zones/**/*';
+
+html {
+  height: 100%;
+  color: $color;
+  font-family: Helvetica Neue;
+  font-weight: lighter;
+}
+
+html, body {
+  @include background(linear-gradient(top, #C5F7C5, #47532D));
+  margin: 0;
+  padding: 0;
+}
+
+html, body, main {
+  @include display(flex);
+  @include flex(1);
+  @include flex-direction(column);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: lighter;
+}
+
+h1 {
+  font-size: 4.5em;
+  text-shadow: 0 1px 3px #6AB35D;
+}

@@ -1,0 +1,5 @@
+<%= form_for zone, builder: ZoneBuilder do |f| %>
+  <%= f.text_field :name, placeholder: t('zones.form.name') %>
+  <%= f.gpio %>
+  <%= f.button t('zones.form.button') %>
+<% end %>

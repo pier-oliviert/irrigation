@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <%= content_tag :title, t('title') %>
+  <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
+  <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
+  <%= csrf_meta_tags %>
+</head>
+
+<body>
+
+<%= content_tag :main, class: [controller_name, action_name], as: "Listener" do %>
+  <%= yield %>
+<% end %>
+
+</body>
+</html>

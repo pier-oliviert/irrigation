@@ -1,0 +1,9 @@
+input, select, option, button {
+  font-family: $font-family;
+  font-size: 1em;
+  outline: none;
+}
+
+button, input[type=submit] {
+  cursor: pointer;
+}

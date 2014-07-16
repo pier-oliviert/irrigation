@@ -1,0 +1,3 @@
+[submodule "lib/gpio"]
+	path = lib/gpio
+	url = https://github.com/davecheney/gpio.git

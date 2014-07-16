@@ -1,0 +1,12 @@
+button, .button {
+  padding: $button-padding;
+  background: $button-background;
+  color: $button-color;
+  border-radius: $button-radius;
+  text-decoration: none;
+  font-weight: $button-font-weight;
+}
+
+button {
+  border: none;
+}

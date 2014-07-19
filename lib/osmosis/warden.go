@@ -60,7 +60,8 @@ func (w *Warden) list() error {
       if err != nil {
         return err
       }
-      notify(connections, cmd)
+
+      notify(clients, cmd)
     }
   }
 

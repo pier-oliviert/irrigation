@@ -19,6 +19,7 @@ module Broadcaster
 
     def parse(msg)
       return if msg.empty?
+      puts msg
       msg.split(":")
     end
 

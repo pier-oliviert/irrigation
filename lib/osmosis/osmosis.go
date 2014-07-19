@@ -13,12 +13,12 @@ import (
 )
 
 var db *sql.DB
-var connections []net.Conn
 var ln net.Listener
 var warden *Warden
 
 func main() {
 	fmt.Printf("Osmosis starting up...\n")
+	log.SetFlags(log.LstdFlags|log.Lshortfile)
 	var err error
 	db, err = sql.Open("postgres", "user=pothibo dbname=irrigation_dev sslmode=disable")
 
@@ -39,12 +39,12 @@ func main() {
 
 	for {
 		conn, err := ln.Accept()
-		connections = append(connections, conn)
 		if err != nil {
 			fmt.Printf("*** Connection Error:  %s\n", err)
 			continue
 		}
-		go listen(conn)
+		client := AddClient(conn)
+		go client.Listen()
 	}
 }
 

@@ -40,6 +40,10 @@ func RemoveClient(c *Client) {
     }
   }
 
+  if idx < 0 {
+    return
+  }
+
   if idx != len(clients) - 1 {
     clients[idx] = clients[len(clients) - 1]
   }

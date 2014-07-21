@@ -17,8 +17,6 @@ func TestAddingClient(t *testing.T) {
 }
 
 func TestReadingByte(t *testing.T) {
-  t.Log("Helo")
-  t.Log(clients)
   client := clients[0]
   data := make([]byte, 32)
   client.Conn.Write([]byte("Hello"))

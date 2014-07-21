@@ -7,13 +7,25 @@ import (
   "os"
   "os/signal"
   "encoding/json"
+  "github.com/stianeikeland/go-rpio"
   )
+
+var gpios []int = []int{3,5,8,10,11,12,13,15,16,18,19,21,22,23,24,26}
+var pins map[int]*Pin
 
 func main() {
   path := "/tmp/gpio.sock"
   if syscall.Getuid() != 0 {
     log.Fatal("Root privilege required to handle GPIO")
   }
+
+  if err := rpio.Open(); err != nil {
+    log.Fatal("Couldn't initialize GPIO pins")
+  }
+
+  defer rpio.Close()
+
+  pins = initializePins(gpios)
 
   addr, err := net.ResolveUnixAddr("unix", path)
   handleFatalErr(err)
@@ -62,6 +74,14 @@ func exit(ln *net.UnixListener) {
   }(sigc)
 }
 
+func initializePins(gpios []int) map[int]*Pin {
+  pins := make(map[int]*Pin)
+  for _, id := range gpios {
+    pins[id] = NewPin(int64(id))
+  }
+  return pins
+}
+
 func OpenGPIO(id int64) {
   defer ListGPIO()
 }
@@ -71,12 +91,12 @@ func CloseGPIO(id int64) {
 }
 
 func ListGPIO() {
-  var pins []*Pin
-  for i := 0; i < 15; i++ {
-    pins = append(pins, NewPin(int64(i), int64(1)))
+  var list []Pin
+  for _, value := range pins {
+    list = append(list, *value)
   }
 
-  data, err := json.Marshal(pins)
+  data, err := json.Marshal(list)
   if err != nil {
     log.Fatal(err)
   }

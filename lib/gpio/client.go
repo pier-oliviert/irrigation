@@ -29,7 +29,7 @@ func AddClient(conn net.Conn) (*Client) {
 }
 
 func RemoveClient(c *Client) {
-  log.Print("Client Deconnected")
+  log.Print("Client disconnected")
   c.Conn.Close()
   idx := -1
   for i := 0; i < len(clients); i++ {

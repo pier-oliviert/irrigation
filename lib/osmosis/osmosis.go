@@ -9,33 +9,34 @@ import (
   "net"
 	_ "github.com/lib/pq"
 	"database/sql"
-	"github.com/stianeikeland/go-rpio"
 )
 
 var db *sql.DB
 var ln net.Listener
 var warden *Warden
+var gpio *GPIO
 
 func main() {
 	fmt.Printf("Osmosis starting up...\n")
 	log.SetFlags(log.LstdFlags|log.Lshortfile)
+
+	sigc := make(chan os.Signal, 1)
+	signal.Notify(sigc, os.Interrupt, os.Kill, syscall.SIGTERM)
+
 	var err error
 	db, err = sql.Open("postgres", "user=pothibo dbname=irrigation_dev sslmode=disable")
+	handleFatalErr(err)
 
-	if err != nil {
-		log.Fatal(err)
-	}
+	go exit(sigc)
+	conn, err := net.Dial("unix", "/tmp/gpio.sock")
+	handleFatalErr(err)
 
-	activateGPIO()
-
-	go exit()
+	gpio = NewGPIO(conn)
 
 	ln, err = net.Listen("unix", "../tmp/sockets/osmosis.sock")
-	if err != nil {
-		fmt.Printf("*** Fatal Error:  %s\n", err)
-	}
+	handleFatalErr(err)
 
-	warden = NewWarden(db)
+	go StartWarden(db)
 
 	for {
 		conn, err := ln.Accept()
@@ -46,36 +47,16 @@ func main() {
 		client := AddClient(conn)
 		go client.Listen()
 	}
+
+	sigc <- syscall.SIGINT
 }
 
-func exit() {
-	sigc := make(chan os.Signal, 1)
-	signal.Notify(sigc, os.Interrupt, os.Kill, syscall.SIGTERM)
-	go func(c chan os.Signal) {
-		sig := <-c
-		log.Printf("Caught signal %s: shutting down.", sig)
-		ln.Close()
-		os.Exit(0)
-	}(sigc)
-}
-
-func activateGPIO() error {
-	zones, err := zones(db)
-
-	if err != nil {
-		return err
-	}
-
-	for zones.Next() {
-		var gpio int
-		if err := zones.Scan(&gpio); err != nil {
-			return err
-		}
-
-		_ = rpio.Pin(gpio)
-		//pin.Output()
-	}
-	return nil
+func exit(c chan os.Signal) {
+	sig := <-c
+	log.Printf("Caught signal %s: shutting down.", sig)
+	gpio.Disconnect()
+	ln.Close()
+	os.Exit(0)
 }
 
 func zones(db *sql.DB) (rows *sql.Rows, error error) {
@@ -84,4 +65,17 @@ func zones(db *sql.DB) (rows *sql.Rows, error error) {
 		return nil, err
 	}
 	return rows, nil
+}
+
+func notify(clients []*Client, msg string) {
+	for i := 0; i < len(clients); i++ {
+		client := clients[i]
+		client.Notify <- msg
+	}
+}
+
+func handleFatalErr(err error) {
+	if err != nil {
+		log.Fatalf("*** Fatal Error: %s", err)
+	}
 }

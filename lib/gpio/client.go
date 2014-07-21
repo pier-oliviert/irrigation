@@ -2,8 +2,9 @@ package main
 
 import (
   "log"
-  "strings"
   "net"
+  "strings"
+  "strconv"
   )
 
 type Client struct {
@@ -20,15 +21,16 @@ func AddClient(conn net.Conn) (*Client) {
     Notify: make(chan string),
   }
 
-  go c.listenForUpdate()
-
   clients = append(clients, c)
 
+  go c.Listen()
+  go c.listenForUpdate()
   return c
 }
 
 func RemoveClient(c *Client) {
   log.Print("Client Deconnected")
+  c.Conn.Close()
   idx := -1
   for i := 0; i < len(clients); i++ {
     obj := clients[i]
@@ -44,7 +46,6 @@ func RemoveClient(c *Client) {
 
   clients = clients[:len(clients) -1]
 
-  c.Conn.Close()
 }
 
 func (c *Client) Read(buffer []byte) (int, error) {
@@ -52,7 +53,6 @@ func (c *Client) Read(buffer []byte) (int, error) {
   if err != nil {
     return 0, err
   }
-
   return bytesRead, nil
 }
 
@@ -66,28 +66,29 @@ func (c *Client) Listen() {
       return
     }
 
-    command, err := NewCommand(strings.Split(string(buf[0:n]), ":"))
+    c.execute(strings.Split(string(buf[0:n]), ":"))
+  }
+}
 
+func (c *Client) execute(instructions []string) {
+  if len(instructions) < 3 {
+    ListGPIO()
+  } else {
+    id, err := strconv.ParseInt(instructions[1], 10, 16)
     if err != nil {
-      log.Print(err)
-      return
+      ListGPIO()
     }
-
-    err = command.Execute()
-
-    if err != nil {
-      log.Print(err)
-      return
+    switch instructions[2] {
+      case "open": OpenGPIO(id)
+      case "close": CloseGPIO(id)
+      default: ListGPIO()
     }
-
-    notify(clients, command.String())
   }
 }
 
 func (c *Client) listenForUpdate() {
   for {
     msg := <-c.Notify
-    log.Print(msg)
     c.Conn.Write([]byte(msg))
   }
 }

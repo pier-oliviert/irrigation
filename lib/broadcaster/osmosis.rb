@@ -9,7 +9,7 @@ module Broadcaster
       raise 'Need a block to run Osmosis' unless block_given?
       Thread.new do
         loop do
-          msg = parse(socket.recv(32))
+          msg = parse(socket.recv(1024 * 32))
           unless msg.nil?
             yield(msg)
           end

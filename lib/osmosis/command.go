@@ -3,6 +3,7 @@ package main
 import (
   "errors"
   "strconv"
+  "strings"
   )
 
 type Command struct {
@@ -35,6 +36,13 @@ func (c *Command) Execute() error {
   return nil
 }
 
+func (c *Command) String() string {
+  var event []string
+  event = append(event, c.name)
+  event = append(event, strconv.FormatInt(c.id, 10))
+  return strings.Join(event, ":")
+}
+
 func (c *Command) open() error {
   rows, err := db.Query("SELECT zones.gpio, zones.name FROM zones inner join sprinkles on (sprinkles.zone_id = zones.id) WHERE sprinkles.id = $1", c.id)
   if err != nil {
@@ -43,11 +51,11 @@ func (c *Command) open() error {
 
   for rows.Next() {
     var name string
-    var gpio int
-    if err := rows.Scan(&gpio, &name); err != nil {
+    var id int
+    if err := rows.Scan(&id, &name); err != nil {
       return err
     }
-    // Open the GPIO.
+    gpio.Open(int64(id))
   }
   return nil
 }
@@ -60,11 +68,11 @@ func (c *Command) close() error {
 
   for rows.Next() {
     var name string
-    var gpio int
-    if err := rows.Scan(&gpio, &name); err != nil {
+    var id int
+    if err := rows.Scan(&id, &name); err != nil {
       return err
     }
-    // Close the GPIO.
+    gpio.Close(int64(id))
   }
   return nil
 }

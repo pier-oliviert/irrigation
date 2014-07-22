@@ -13,14 +13,18 @@ import (
 var gpios []int = []int{3,5,8,10,11,12,13,15,16,18,19,21,22,23,24,26}
 var pins map[int]*Pin
 
+func init() {
+  log.SetFlags(log.LstdFlags|log.Lshortfile)
+  if err := rpio.Open(); err != nil {
+    log.Fatal("Couldn't initialize GPIO pins")
+  }
+}
+
 func main() {
+
   path := "/tmp/gpio.sock"
   if syscall.Getuid() != 0 {
     log.Fatal("Root privilege required to handle GPIO")
-  }
-
-  if err := rpio.Open(); err != nil {
-    log.Fatal("Couldn't initialize GPIO pins")
   }
 
   defer rpio.Close()
@@ -83,11 +87,15 @@ func initializePins(gpios []int) map[int]*Pin {
 }
 
 func OpenGPIO(id int64) {
-  defer ListGPIO()
+  pin := pins[int(id)]
+  pin.Open()
+  ListGPIO()
 }
 
 func CloseGPIO(id int64) {
-  defer ListGPIO()
+  pin := pins[int(id)]
+  pin.Close()
+  ListGPIO()
 }
 
 func ListGPIO() {
@@ -100,12 +108,12 @@ func ListGPIO() {
   if err != nil {
     log.Fatal(err)
   }
-  updateClients(string(data))
+  updateClients(data)
 }
 
-func updateClients(msg string) {
+func updateClients(msg []byte) {
   for i := 0; i < len(clients); i++ {
     client := clients[i]
-    client.Notify <- msg
+    client.Conn.Write(msg)
   }
 }

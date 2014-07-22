@@ -2,27 +2,68 @@ package main
 
 import (
   "testing"
+  "log"
+  "encoding/json"
   "net"
   )
 
 func TestAddingClient(t *testing.T) {
   length := len(clients)
 
-  connectPair(t)
+  connectPair()
 
   if length + 2 != len(clients) {
-    t.Log("The client was not added to the slice")
+    t.Logf("The client was not added to the slice. # of clients connected: %d", len(clients))
     t.Fail()
   }
 }
 
-func TestReadingByte(t *testing.T) {
+func TestSendOpenActionToClient(t *testing.T) {
   client := clients[0]
-  data := make([]byte, 32)
-  client.Conn.Write([]byte("Hello"))
-  length, err := client.Read(data)
-  if err != nil || length == 0 {
-    t.Log("Couldn't read data")
+
+  payload := make(map[string]Action)
+
+  payload["action"] = Action{
+    Name: "open",
+    Id: 10,
+  }
+
+  d, err := json.Marshal(payload)
+  if err != nil {
+    t.Log(err)
+    t.Fail()
+  }
+
+  client.Conn.Write(d)
+
+  pin := pins[gpios[3]]
+  if pin.State() != 1 {
+    t.Logf("The GPIO is not opened: %d", pin.Id())
+    t.Fail()
+  }
+}
+
+func TestSendCloseActionToClient(t *testing.T) {
+  client := clients[1]
+
+  payload := make(map[string]Action)
+
+  payload["action"] = Action{
+    Name: "close",
+    Id: 10,
+  }
+
+  d, err := json.Marshal(payload)
+  if err != nil {
+    t.Log(err)
+    t.Fail()
+  }
+
+  client.Conn.Write(d)
+
+  pin := pins[gpios[3]]
+  if pin.State() != 0 {
+    t.Logf("The GPIO is still opened: %d", pin.Id())
     t.Fail()
   }
 }
@@ -38,16 +79,13 @@ func TestDeconnectingClient(t *testing.T) {
   }
 }
 
-func connectPair(t *testing.T) {
+func connectPair() {
   conn1, conn2 := net.Pipe()
   socks := []net.Conn{conn1, conn2}
   for i := 0; i < 2; i++ {
-    if len(clients) - 1 < i {
-      c := AddClient(socks[i])
-      if c == nil {
-        t.Log("Couldn't add a client")
-        t.Fail()
-      }
+    c := AddClient(socks[i])
+    if c == nil {
+      log.Fatal("Couldn't add a client")
     }
   }
 }

@@ -2,13 +2,19 @@ package main
 
 import(
   "testing"
-  "github.com/stianeikeland/go-rpio"
-  "encoding/json"
 )
 
+type JSONPin struct {
+  Id int `json:"id"`
+  Status int `json:"status"`
+}
+
+func init() {
+  connectPair()
+  pins = initializePins(gpios)
+}
+
 func TestPinInitializations(t *testing.T) {
-  initializeRPIO(t)
-  defer closeRPIO(t)
 
   pins = initializePins(gpios)
   if len(pins) != 16 {
@@ -17,37 +23,34 @@ func TestPinInitializations(t *testing.T) {
   }
 }
 
+func TestOpenGPIO(t *testing.T) {
+  connectPair()
+  go func() {
+    _ = <-clients[0].Notify
+  }()
+
+  id := gpios[3]
+  pin := pins[id]
+  OpenGPIO(int64(id))
+
+  if pin.State() != 1 {
+    t.Log("Pin should be opened")
+    t.Fail()
+  }
+}
+
 func TestListGPIO(t *testing.T) {
-  initializeRPIO(t)
-  defer closeRPIO(t)
-
-  pins = initializePins(gpios)
-  type JSONPin struct {
-    Id int `json:"id"`
-    Status int `json:"status"`
-  }
-
-  var result []JSONPin
-
-  connectPair(t)
-  client := clients[0]
   ListGPIO()
-  data := <- client.Notify 
+}
 
-  json.Unmarshal([]byte(data), &result)
-  if len(result) != len(pins) {
-    t.Log("Pin status sent was not the same as the amount of pins")
+func TestCloseGPIO(t *testing.T) {
+  id := gpios[3]
+  pin := pins[id]
+  CloseGPIO(int64(id))
+
+  if pin.State() != 0 {
+    t.Log("Pin should be closed")
     t.Fail()
   }
 }
 
-func initializeRPIO(t *testing.T) {
-  if err:= rpio.Open(); err != nil {
-    t.Log("Couldn't open GPIO memory space")
-    t.Fail()
-  }
-}
-
-func closeRPIO(t *testing.T) {
-  rpio.Close()
-}

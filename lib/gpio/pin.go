@@ -19,6 +19,10 @@ func NewPin(id int64) *Pin {
   return p
 }
 
+func (p *Pin) Id() int8 {
+  return int8(p.gpio)
+}
+
 func (p *Pin) Open() {
   p.gpio.High()
 }
@@ -27,16 +31,16 @@ func (p *Pin) Close() {
   p.gpio.Low()
 }
 
-func (p *Pin) Status() int {
+func (p *Pin) State() int {
   return int(p.gpio.Read())
 }
 
 func (p *Pin) MarshalJSON() ([]byte, error) {
   return json.Marshal(struct{
     Id int `json:"id"`
-    Status int `json:"status"`
+    State int `json:"state"`
   }{
-    Status: p.Status(),
+    State: p.State(),
     Id: int(p.gpio),
   })
 }

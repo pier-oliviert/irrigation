@@ -1,14 +1,26 @@
 class SprinklesController < ApplicationController
   def create
     @sprinkle = zone.sprinkles.create! sprinkle_params
-    osmosis.dispatch "open:#{@sprinkle.id}"
+    cmd = {
+      action: {
+        name: "open",
+        id: @sprinkle.id
+      }
+    }
+    osmosis.dispatch JSON.generate(cmd)
   end
 
   def destroy
     @sprinkle = Sprinkle.find(params[:id])
     @sprinkle.ends_at = Time.now
     @sprinkle.save!
-    osmosis.dispatch "close:#{@sprinkle.id}"
+    cmd = {
+      action: {
+        name: "close",
+        id: @sprinkle.id
+      }
+    }
+    osmosis.dispatch JSON.generate(cmd)
   end
 
   protected

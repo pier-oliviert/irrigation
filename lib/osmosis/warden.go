@@ -23,13 +23,9 @@ func StartWarden(db *sql.DB) {
   go warden.notify()
   go warden.makeTheRound()
 
-  c := time.Tick(1 * time.Second)
-  for _ = range c {
+  for _ = range time.Tick(time.Second) {
     log.Print("Ticking")
-    cmd := &Command{
-      Name: "list",
-    }
-    gpio.Send(cmd)
+    gpio.Send(&Command{Name: "list"})
   }
 }
 
@@ -81,11 +77,10 @@ func (w *Warden) makeTheRound() {
 func (w *Warden) getZones(pins []Pin) ([]Zone, error) {
   var results []Zone
   query, err := db.Query("select zones.id, zones.gpio from zones;")
+  defer query.Close()
   if err != nil {
     return nil, err
   }
-
-  defer query.Close()
 
   for query.Next() {
     var id int64

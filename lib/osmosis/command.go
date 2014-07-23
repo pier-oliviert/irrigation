@@ -31,6 +31,8 @@ func NewCommand(infos []string) (*Command, error) {
 func (c *Command) Execute() error {
   if c.Name == "open" || c.Name == "close" {
     rows, err := db.Query("SELECT zones.gpio FROM zones inner join sprinkles on (sprinkles.zone_id = zones.id) WHERE sprinkles.id = $1", c.Id)
+    defer rows.Close()
+
     if err != nil {
       return err
     }

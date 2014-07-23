@@ -30,8 +30,10 @@ func (g *GPIO) Disconnect() {
   g.conn.Close()
 }
 
-func (g *GPIO) Send(cmd *Command) {
-  g.conn.Write([]byte(cmd.Bytes()))
+func (g *GPIO) Send(c *Command) {
+  go func(c net.Conn, cmd *Command){
+    c.Write([]byte(cmd.Bytes()))
+  }(g.conn, c)
 }
 
 func (g *GPIO) listen() {

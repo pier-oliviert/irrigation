@@ -28,7 +28,7 @@ func AddClient(conn net.Conn) (*Client) {
 }
 
 func RemoveClient(c *Client) {
-  log.Print("Client Disconnected")
+  log.Print("Client disconnected")
   idx := -1
   for i := 0; i < len(clients); i++ {
     obj := clients[i]

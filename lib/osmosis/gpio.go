@@ -2,7 +2,6 @@ package main
 
 import (
   "net"
-  "log"
   "encoding/json"
   )
 
@@ -32,7 +31,6 @@ func (g *GPIO) Disconnect() {
 }
 
 func (g *GPIO) Send(cmd *Command) {
-  log.Print("Sending command")
   g.conn.Write([]byte(cmd.Bytes()))
 }
 

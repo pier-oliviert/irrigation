@@ -11,43 +11,38 @@ import (
 type Warden struct {
   gpios []int
   Pins chan []Pin
-  Updates chan Update
+  Updates chan []byte
 }
-
-type Update struct {
-  Clients []*Client
-  Message []byte
-}
-
-var ticker = time.NewTicker(time.Second)
 
 func StartWarden(db *sql.DB) {
   warden = &Warden{
     Pins: make(chan []Pin),
-    Updates: make(chan Update),
+    Updates: make(chan []byte),
   }
 
   go warden.notify()
   go warden.makeTheRound()
 
-  func() {
-    for _ = range ticker.C {
-      cmd := &Command{
-        Name: "list",
-      }
-      gpio.Send(cmd)
+  c := time.Tick(1 * time.Second)
+  for _ = range c {
+    log.Print("Ticking")
+    cmd := &Command{
+      Name: "list",
     }
-  }()
+    gpio.Send(cmd)
+  }
 }
 
 func (w *Warden) notify() {
   for {
     update := <- w.Updates
-    clients = update.Clients
-    for i := 0; i < len(clients); i++ {
-      client := clients[i]
-      client.Conn.Write(update.Message)
+    fn := func(cs []*Client) {
+      for i := 0; i < len(cs); i++ {
+        client := cs[i]
+        client.Conn.Write(update)
+      }
     }
+    ExecuteOnClients(fn)
   }
 }
 
@@ -77,10 +72,7 @@ func (w *Warden) makeTheRound() {
     if outdated == false {
       payload, err := json.Marshal(zones)
       if err == nil {
-        w.Updates <- Update{
-          Clients: clients,
-          Message: payload,
-        }
+        w.Updates <- payload
       }
     }
   }

@@ -14,6 +14,7 @@ type Client struct {
 }
 
 var clients []*Client
+var mutex sync.RWMutex
 
 func AddClient(conn net.Conn) (*Client) {
   log.Print("Client connected")
@@ -22,13 +23,17 @@ func AddClient(conn net.Conn) (*Client) {
     decoder: json.NewDecoder(conn),
   }
 
+  mutex.Lock()
   clients = append(clients, c)
-
+  mutex.Unlock()
   return c
 }
 
 func RemoveClient(c *Client) {
   log.Print("Client disconnected")
+  mutex.Lock()
+  defer mutex.Unlock()
+
   idx := -1
   for i := 0; i < len(clients); i++ {
     obj := clients[i]
@@ -49,6 +54,12 @@ func RemoveClient(c *Client) {
   clients = clients[:len(clients) -1]
 
   c.Conn.Close()
+}
+
+func ExecuteOnClients(fn func([]*Client)) {
+  mutex.Lock()
+  fn(clients)
+  mutex.Unlock()
 }
 
 func (c *Client) Read(buffer []byte) (int, error) {

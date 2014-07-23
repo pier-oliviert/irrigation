@@ -51,13 +51,6 @@ func RemoveClient(c *Client) {
   c.Conn.Close()
 }
 
-func Clients() {
-  mutex := sync.RWMutex
-  mutex.Lock()
-  c = clients
-  mutex.Unlock()
-}
-
 func (c *Client) Read(buffer []byte) (int, error) {
   bytesRead, err := c.Conn.Read(buffer)
   if err != nil {

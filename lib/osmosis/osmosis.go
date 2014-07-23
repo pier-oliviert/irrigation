@@ -18,6 +18,7 @@ var gpio *GPIO
 
 func main() {
 	fmt.Printf("Osmosis starting up...\n")
+
 	log.SetFlags(log.LstdFlags|log.Lshortfile)
 
 	sigc := make(chan os.Signal, 1)

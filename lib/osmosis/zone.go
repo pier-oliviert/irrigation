@@ -31,11 +31,12 @@ func (z *Zone) extractPinInfo(pins []Pin) {
 
 func (z *Zone) HasActiveSchedule() bool {
   query, err := db.Query("select zones.gpio from zones inner join sprinkles on (sprinkles.zone_id = zones.id) where sprinkles.ends_at > CAST(NOW() at time zone 'utc' as timestamp);")
-  defer query.Close()
   if err != nil {
     log.Print(err)
     return false
   }
+
+  defer query.Close()
 
   for query.Next() {
     return true

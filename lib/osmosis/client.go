@@ -62,15 +62,6 @@ func ExecuteOnClients(fn func([]*Client)) {
   mutex.Unlock()
 }
 
-func (c *Client) Read(buffer []byte) (int, error) {
-  bytesRead, err := c.Conn.Read(buffer)
-  if err != nil {
-    return 0, err
-  }
-
-  return bytesRead, nil
-}
-
 func (c *Client) Listen() {
   defer RemoveClient(c)
 

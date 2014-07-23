@@ -77,10 +77,11 @@ func (w *Warden) makeTheRound() {
 func (w *Warden) getZones(pins []Pin) ([]Zone, error) {
   var results []Zone
   query, err := db.Query("select zones.id, zones.gpio from zones;")
-  defer query.Close()
   if err != nil {
     return nil, err
   }
+
+  defer query.Close()
 
   for query.Next() {
     var id int64

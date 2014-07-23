@@ -5,6 +5,7 @@ import (
   "net"
   "encoding/json"
   "io"
+  "sync"
   )
 
 type Client struct {
@@ -27,7 +28,7 @@ func AddClient(conn net.Conn) (*Client) {
 }
 
 func RemoveClient(c *Client) {
-  log.Print("Client Deconnected")
+  log.Print("Client Disconnected")
   idx := -1
   for i := 0; i < len(clients); i++ {
     obj := clients[i]
@@ -48,6 +49,13 @@ func RemoveClient(c *Client) {
   clients = clients[:len(clients) -1]
 
   c.Conn.Close()
+}
+
+func Clients() {
+  mutex := sync.RWMutex
+  mutex.Lock()
+  c = clients
+  mutex.Unlock()
 }
 
 func (c *Client) Read(buffer []byte) (int, error) {

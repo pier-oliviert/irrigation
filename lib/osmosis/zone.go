@@ -7,7 +7,7 @@ import (
 type Zone struct {
   Id int64 `json:"id"`
   Gpio int64 `json:"gpio"`
-  Status int64 `json:"status"`
+  State int64 `json:"state"`
 }
 
 func NewZone(id int64, gpio int64, pins []Pin) *Zone {
@@ -23,19 +23,23 @@ func NewZone(id int64, gpio int64, pins []Pin) *Zone {
 func (z *Zone) extractPinInfo(pins []Pin) {
   for i := 0; i < len(pins); i++ {
     pin := pins[i]
-    if pin.Id == z.Id {
-      z.Status = pin.Status
+    if pin.Id == z.Gpio {
+      z.State = pin.State
     }
   }
 }
 
 func (z *Zone) HasActiveSchedule() bool {
-  sprinkles, err := db.Query("select zones.gpio from zones inner join sprinkles on (sprinkles.zone_id = zones.id) where sprinkles.ends_at > CAST(NOW() at time zone 'utc' as timestamp);")
+  query, err := db.Query("select zones.gpio from zones inner join sprinkles on (sprinkles.zone_id = zones.id) where sprinkles.ends_at > CAST(NOW() at time zone 'utc' as timestamp);")
   if err != nil {
     log.Print(err)
     return false
   }
 
-  defer sprinkles.Close()
-  return true
+  defer query.Close()
+
+  for query.Next() {
+    return true
+  }
+  return false
 }

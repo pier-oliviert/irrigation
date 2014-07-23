@@ -2,19 +2,24 @@ package main
 
 import (
   "net"
-  "strings"
-  "strconv"
+  "log"
+  "encoding/json"
   )
 
 type GPIO struct {
   conn net.Conn
-  Notify chan string
+  decoder *json.Decoder
+}
+
+type Pin struct {
+  Id int64 `json:"id"`
+  State int64 `json:"state"`
 }
 
 func NewGPIO(c net.Conn) *GPIO {
   gpio = &GPIO{
     conn: c,
-    Notify: make(chan string),
+    decoder: json.NewDecoder(c),
   }
 
   go gpio.listen()
@@ -26,40 +31,19 @@ func (g *GPIO) Disconnect() {
   g.conn.Close()
 }
 
-func (g *GPIO) Open(id int64) {
-  var event []string
-  event = append(event, "action")
-  event = append(event, strconv.FormatInt(id, 10))
-  event = append(event, "open")
-
-  g.conn.Write([]byte(strings.Join(event, ":")))
-}
-
-func (g *GPIO) Close(id int64) {
-  var event []string
-  event = append(event, "action")
-  event = append(event, strconv.FormatInt(id, 10))
-  event = append(event, "close")
-
-  g.conn.Write([]byte(strings.Join(event, ":")))
-}
-
-func (g *GPIO) GetCurrentStatus() {
-  var event []string
-  event = append(event, "status")
-  event = append(event, "list")
-
-  g.conn.Write([]byte(strings.Join(event, ":")))
+func (g *GPIO) Send(cmd *Command) {
+  log.Print("Sending command")
+  g.conn.Write([]byte(cmd.Bytes()))
 }
 
 func (g *GPIO) listen() {
   defer g.Disconnect()
   for {
-    buf := make([]byte, 1024 * 32) //32k for now... should be enough.
-    n, err := g.conn.Read(buf)
-    if err != nil {
+    var pins []Pin
+    if err := g.decoder.Decode(&pins); err != nil {
       return
     }
-    warden.Notify <- buf[0:n]
+
+    warden.Pins <- pins
   }
 }

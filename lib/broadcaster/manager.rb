@@ -6,12 +6,12 @@ require_relative '../../app/models/zone'
 module Broadcaster
   class Manager
     def initialize
+      configure!
       @connections = []
       @osmosis = Broadcaster::Osmosis.new
       @osmosis.run! do |cmd|
-        sprinkle = Sprinkle.find(cmd.last)
         @connections.each do |c|
-          c.send "zone:#{cmd.first}:#{sprinkle.zone.id}"
+          c.send JSON.generate(cmd)
         end
       end
     end

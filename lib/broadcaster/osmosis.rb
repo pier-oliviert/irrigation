@@ -9,7 +9,9 @@ module Broadcaster
       raise 'Need a block to run Osmosis' unless block_given?
       Thread.new do
         loop do
-          msg = parse(socket.recv(1024 * 32))
+          d, sender, flags, _ = socket.recvmsg
+          msg = parse(d)
+          puts msg
           unless msg.nil?
             yield(msg)
           end
@@ -19,8 +21,11 @@ module Broadcaster
 
     def parse(msg)
       return if msg.empty?
-      puts msg
-      msg.split(":")
+      begin
+        return JSON.parse(msg)
+      rescue StandardError => e
+        puts e
+      end
     end
 
     def socket

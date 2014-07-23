@@ -28,7 +28,7 @@ func main() {
 	handleFatalErr(err)
 
 	go exit(sigc)
-	conn, err := net.Dial("unix", "/tmp/gpio.sock")
+	conn, err := net.Dial("unix", "/tmp/gobble.sock")
 	handleFatalErr(err)
 
 	gpio = NewGPIO(conn)
@@ -65,13 +65,6 @@ func zones(db *sql.DB) (rows *sql.Rows, error error) {
 		return nil, err
 	}
 	return rows, nil
-}
-
-func notify(clients []*Client, msg string) {
-	for i := 0; i < len(clients); i++ {
-		client := clients[i]
-		client.Notify <- msg
-	}
 }
 
 func handleFatalErr(err error) {

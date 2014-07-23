@@ -10,36 +10,50 @@ import (
 
 type Warden struct {
   gpios []int
-  Notify chan []byte
+  Pins chan []Pin
+  Updates chan Update
 }
 
-type Pin struct {
-  Id int64
-  Status int64
+type Update struct {
+  Clients []*Client
+  Message []byte
 }
 
 var ticker = time.NewTicker(time.Second)
 
 func StartWarden(db *sql.DB) {
   warden = &Warden{
-    Notify: make(chan []byte),
+    Pins: make(chan []Pin),
+    Updates: make(chan Update),
   }
 
+  go warden.notify()
   go warden.makeTheRound()
 
   func() {
     for _ = range ticker.C {
-      gpio.GetCurrentStatus()
+      cmd := &Command{
+        Name: "list",
+      }
+      gpio.Send(cmd)
     }
   }()
 }
 
+func (w *Warden) notify() {
+  for {
+    update := <- w.Updates
+    clients = update.Clients
+    for i := 0; i < len(clients); i++ {
+      client := clients[i]
+      client.Conn.Write(update.Message)
+    }
+  }
+}
+
 func (w *Warden) makeTheRound() {
   for {
-    data := <- w.Notify
-    var pins []Pin
-    json.Unmarshal(data, &pins)
-
+    pins := <- w.Pins
     zones, err := w.getZones(pins)
 
     if err != nil {
@@ -49,16 +63,24 @@ func (w *Warden) makeTheRound() {
     outdated := false
     for i := 0; i < len(zones); i++ {
       z := zones[i]
-      if !z.HasActiveSchedule() && z.Status > 0 {
-        gpio.Close(z.Gpio)
-        outdated := true
+      if !z.HasActiveSchedule() && z.State > 0 {
+        cmd := &Command{
+          Name: "close",
+          Id: z.Gpio,
+        }
+        gpio.Send(cmd)
+        outdated = true
+        break
       }
     }
 
-    if !outdated {
+    if outdated == false {
       payload, err := json.Marshal(zones)
       if err == nil {
-        notify(clients, string(payload))
+        w.Updates <- Update{
+          Clients: clients,
+          Message: payload,
+        }
       }
     }
   }

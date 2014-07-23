@@ -2,13 +2,14 @@ package main
 
 import (
   "log"
-  "strings"
   "net"
+  "encoding/json"
+  "io"
   )
 
 type Client struct {
   Conn net.Conn
-  Notify chan string
+  decoder *json.Decoder
 }
 
 var clients []*Client
@@ -17,10 +18,8 @@ func AddClient(conn net.Conn) (*Client) {
   log.Print("Client connected")
   c := &Client{
     Conn: conn,
-    Notify: make(chan string),
+    decoder: json.NewDecoder(conn),
   }
-
-  go c.listenForUpdate()
 
   clients = append(clients, c)
 
@@ -64,34 +63,23 @@ func (c *Client) Listen() {
   defer RemoveClient(c)
 
   for {
-    buf := make([]byte, 32)
-    n, err := c.Read(buf)
-    if err != nil {
-      return
+    var data map[string]Command
+    if err := c.decoder.Decode(&data); err != nil {
+      // break the loop if it's a socket error
+      _, netErr := err.(net.Error)
+      if netErr == true || err == io.EOF {
+        break
+      } else {
+        continue
+      }
     }
 
-    command, err := NewCommand(strings.Split(string(buf[0:n]), ":"))
+    cmd, ok := data["action"]
 
-    if err != nil {
-      log.Print(err)
-      return
+    if ok {
+      if err := cmd.Execute(); err != nil {
+        log.Print(err)
+      }
     }
-
-    err = command.Execute()
-
-    if err != nil {
-      log.Print(err)
-      return
-    }
-
-    notify(clients, command.String())
-  }
-}
-
-func (c *Client) listenForUpdate() {
-  for {
-    msg := <-c.Notify
-    log.Print(msg)
-    c.Conn.Write([]byte(msg))
   }
 }

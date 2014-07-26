@@ -3,6 +3,7 @@ class CreateSprinkles < ActiveRecord::Migration
     create_table :sprinkles do |t|
       t.datetime :ends_at, null: false
       t.references :zone, null: false
+      t.boolean :active, default: true
       t.timestamps
     end
   end

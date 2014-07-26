@@ -1,6 +1,6 @@
 class Listener
   constructor: ->
-    @socket = new WebSocket('ws://localhost:21343')
+    @socket = new WebSocket("ws://#{location.hostname}:21343")
     @socket.onmessage = @received
 
   addEventListeners: =>

@@ -4,7 +4,7 @@ class SprinklesController < ApplicationController
     cmd = {
       action: {
         name: "open",
-        id: @sprinkle.id
+        id: @sprinkle.zone.gpio
       }
     }
     osmosis.dispatch JSON.generate(cmd)
@@ -17,7 +17,7 @@ class SprinklesController < ApplicationController
     cmd = {
       action: {
         name: "close",
-        id: @sprinkle.id
+        id: @sprinkle.zone.gpio
       }
     }
     osmosis.dispatch JSON.generate(cmd)

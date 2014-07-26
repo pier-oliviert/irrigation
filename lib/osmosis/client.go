@@ -79,6 +79,7 @@ func (c *Client) Listen() {
 
     cmd, ok := data["action"]
 
+    log.Println("Received command: ", cmd)
     if ok {
       if err := cmd.Execute(); err != nil {
         log.Print(err)

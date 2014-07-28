@@ -7,11 +7,13 @@ import (
 	"sync"
 )
 
+// All those fields should be private and only
+// be accessible via Get/Set to make use of mutexes.
 type Zone struct {
 	Id    int64 `json:"id"`
 	Gpio  int64 `json:"gpio"`
 	State int64 `json:"state"`
-	mutex sync.Mutex
+	mutex sync.RWMutex
 }
 
 type Pin struct {
@@ -46,6 +48,12 @@ func (z *Zone) SetState(s int64) bool {
 		return true
 	}
 	return false
+}
+
+func (z *Zone) GetState() int64 {
+	z.mutex.Lock()
+	defer z.mutex.Unlock()
+	return z.State
 }
 
 func (z *Zone) SetOpen() {

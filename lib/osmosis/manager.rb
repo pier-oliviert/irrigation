@@ -1,35 +1,21 @@
-require 'osmosis/instance'
+require 'osmosis/backend'
+require 'osmosis/clients'
+
 module Osmosis
   class Manager
-    attr_reader :socket, :error
+    attr_reader :backend, :clients
 
-    def initialize(app)
-      @app = app
-      connect!
+    def initialize
+      @backend = Osmosis::Backend.new
+      @clients = Osmosis::Clients.new
     end
 
-    def call(env)
-      env['osmosis'] = Osmosis::Instance.new(socket)
-      @app.call(env)
-    end
+    def start!
+      @clients.start!
 
-    private
-
-    def connect!
-      begin
-        @socket ||= UNIXSocket.new(path)
-      rescue Exception => e
-        @error = e
+      @backend.start! do |msg|
+        @clients.channel.push msg
       end
-    end
-
-    def connected?
-      error.nil?
-    end
-
-    def path
-      tmp = Rails.application.paths['tmp'].existent.first
-      tmp + '/sockets/osmosis.sock'
     end
   end
 end

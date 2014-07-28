@@ -7,6 +7,7 @@ Bundler.require(*Rails.groups)
 module Irrigation
   class Application < Rails::Application
     paths.add "config/locales",      glob: "**/*.{rb,yml}"
+    paths.add "sockets/osmosis",     with: "tmp/sockets/osmosis.sock"
 
     paths.add 'lib/osmosis.rb', eager_load: true
     # One day, paths won't be totally retarded

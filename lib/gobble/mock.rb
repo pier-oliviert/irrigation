@@ -38,7 +38,8 @@ while true
   c = serv.accept
   @clients << c
   Thread.new do
-    while true do
+    running = true
+    while running do
       begin
         msg, sender, flags, _ = c.recvmsg
         data = JSON.parse(msg)
@@ -68,9 +69,11 @@ while true
           end
         end
       rescue StandardError => e
-        puts e
+        running false
       end
     end
+    @clients.delete(c)
+    c.close()
   end
 end
 

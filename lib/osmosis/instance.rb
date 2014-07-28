@@ -1,13 +1,12 @@
 module Osmosis
   class Instance
 
-    def initialize(socket)
-      @socket = socket
+    def initialize(channel)
+      @channel = channel
     end
 
     def dispatch(cmd)
-      return if @socket.nil?
-      @socket.send cmd, 0
+      @channel.push cmd
     end
   end
 end

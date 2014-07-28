@@ -67,7 +67,7 @@ func (w *Warden) monitor(db *sql.DB) {
 
 			query.Close()
 
-			if active == false && zone.State > 0 {
+			if active == false && zone.GetState() > 0 {
 				w.GPIO.Send(&Command{Name: "close", Id: zone.Gpio})
 			}
 		}

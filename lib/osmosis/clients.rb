@@ -4,6 +4,7 @@ module Osmosis
 
     def initialize
       @channel = EM::Channel.new
+      Thread.abort_on_exception = true
     end
 
     def start!

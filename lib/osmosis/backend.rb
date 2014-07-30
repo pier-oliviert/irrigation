@@ -20,6 +20,9 @@ module Osmosis
     end
 
     def socket
+      if path.nil?
+        raise "Osmosis is not started yet. You need to start it before launching the frontend"
+      end
       @socket ||= UNIXSocket.new(path)
     end
 

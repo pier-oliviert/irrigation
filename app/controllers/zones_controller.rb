@@ -9,6 +9,16 @@ class ZonesController < ApplicationController
     redirect_to :root
   end
 
+  def edit
+    @zone = Zone.find(params[:id])
+  end
+
+  def update
+    @zone = Zone.find(params[:id])
+    @zone.update zone_params
+    redirect_to :zones
+  end
+
   protected
 
   def zone_params

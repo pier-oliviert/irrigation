@@ -1,6 +1,6 @@
 <h1>Zones</h1>
 
-<section>
+<section class="zones">
   <ul>
     <% @zones.each do |zone| %>
       <li>
@@ -18,6 +18,6 @@
       </li>
     <% end %>
   </ul>
-
-  <%= link_to "Créer une nouvelle zone", new_zone_path %>
 </section>
+
+<%= link_to "Créer une nouvelle zone", new_zone_path, class: %w(new zone) %>

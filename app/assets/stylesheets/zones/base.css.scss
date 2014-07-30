@@ -1,5 +1,44 @@
 main.zones.index {
-  li {
 
+  section.zones {
+    margin: 0 1em;
+    border: 1px solid #68A75C;
+    background: #CAECCA;
+    border-radius: 4px;
+  }
+
+  li:not(:last-child) {
+    border-bottom: 1px solid #68A75C;
+  }
+
+  h2 {
+    font-size: 3em;
+  }
+
+
+  a.new.zone {
+    margin: 3em auto;
+    padding: 0.3em 2em;
+    text-align: center;
+    font-size: 2.5em;
+    text-decoration: none;
+    color: #7DDF7D;
+    border: 1px solid transparent;
+
+    &:before {
+      font-family: entypo;
+      content: "➕";
+      margin-right: 0.5em;
+    }
+
+    &:hover {
+      border-color: #7DDF7D;
+      border-radius: 2px;
+      background: #376137;
+    }
+
+    &:active {
+      @include box-shadow(inset 0 0 5px 0 #0F1B0F);
+    }
   }
 }

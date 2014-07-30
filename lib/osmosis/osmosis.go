@@ -17,8 +17,9 @@ var ln net.Listener
 var warden *Warden
 
 func main() {
-	var socketPath *string
-	socketPath = flag.String("socket", "osmosis.sock", "Specify where the socket should be created (defaults to ./osmosis.sock)")
+	socketPath := flag.String("socket", "osmosis.sock", "Specify where the socket should be created (defaults to ./osmosis.sock)")
+	flag.Parse()
+	log.Print(*socketPath)
 	fmt.Printf("Osmosis starting up...\n")
 
 	log.SetFlags(log.LstdFlags | log.Lshortfile)

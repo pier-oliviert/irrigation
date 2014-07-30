@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"flag"
 )
 
 var db *sql.DB
@@ -16,6 +17,8 @@ var ln net.Listener
 var warden *Warden
 
 func main() {
+	var socketPath *string
+	socketPath = flag.String("socket", "osmosis.sock", "Specify where the socket should be created (defaults to ./osmosis.sock)")
 	fmt.Printf("Osmosis starting up...\n")
 
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
@@ -31,8 +34,10 @@ func main() {
 
 	warden = NewWarden(db, &GPIO{})
 
-	ln, err = net.Listen("unix", "../tmp/sockets/osmosis.sock")
+	os.Remove(*socketPath)
+	ln, err = net.Listen("unix", *socketPath)
 	handleFatalErr(err)
+
 
 	for {
 		conn, err := ln.Accept()

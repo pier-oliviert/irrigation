@@ -56,10 +56,8 @@ func (z *Zone) GetState() int64 {
 	return z.State
 }
 
-func (z *Zone) SetOpen() {
-}
-
-func (z *Zone) SetClose() {
+func (z *Zone) Opened() bool {
+	return z.GetState() == 0
 }
 
 func ZonesAsJSON(zones []Zone) ([]byte, error) {

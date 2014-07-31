@@ -1,0 +1,6 @@
+<%= form_for [zone, zone.sprinkles.build], builder: SprinkleBuilder, remote: true, html: {class: %w(sprinkle) } do |f| %>
+  <div class="action">
+    <%= f.submit 'Ouvrir pour' %>
+    <%= f.duration %>
+  </div>
+<% end %>

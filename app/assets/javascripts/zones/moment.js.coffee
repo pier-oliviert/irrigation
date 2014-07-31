@@ -2,13 +2,17 @@ class MomentImplementation
   addEventListeners: =>
     @update()
 
+  removeEventListeners: =>
+
   update: =>
     dur = @duration()
-    if dur > 0
-      remaining = [
-        @minutes(dur),
-        @seconds(dur)
-      ].filter(Boolean)
+
+    remaining = [
+      @minutes(dur),
+      @seconds(dur)
+    ].filter(Boolean)
+
+    if remaining.length > 0
       @element().innerText = remaining.join(", ")
       setTimeout(@update, 1000)
     else
@@ -32,4 +36,4 @@ class MomentImplementation
     else if s > 0
       "1 seconde"
 
-Shiny.Models.add MomentImplementation, 'Moment'
+Shiny.Models.add MomentImplementation, 'Sprinkles.Moment'

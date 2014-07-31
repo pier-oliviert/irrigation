@@ -9,6 +9,12 @@ main.zones.index {
 
   li {
     @include display(flex);
+
+    div.status {
+      @include flex(1);
+      @include align-self(center);
+      text-align: right;
+    }
   }
 
   li:not(:last-child) {

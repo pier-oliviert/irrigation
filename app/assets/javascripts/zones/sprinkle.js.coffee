@@ -1,8 +1,9 @@
-class Form
+class Status
   addEventListeners: =>
-    @element().addEventListener "change", @submit
+    @element().querySelector('select').addEventListener "change", @submit
+
   removeEventListeners: =>
-    @element().removeEventListener "change", @submit
+    @element().querySelector('select').removeEventListener "change", @submit
 
   submit: (e) =>
     fd = new FormData(e.target.form)
@@ -12,8 +13,6 @@ class Form
       )
     xhr = new XHR(e.target)
     xhr.send(e.target.form.action, "POST", fd)
+    e.target.children[0].setAttribute('selected', true)
 
-    @element().children[0].setAttribute('selected', true)
-
-
-Shiny.Models.add Form, "Sprinkles.Form"
+Shiny.Models.add Status, "Sprinkles.Status"

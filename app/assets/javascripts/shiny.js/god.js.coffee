@@ -13,6 +13,8 @@ class God
       el.instance.element = ->
         el
       el.instance.addEventListeners()
+      if el.instance.initialize?
+        el.instance.initialize()
     else
       throw "error: #{model} is not registered. Add your model with Shiny.Models.add(#{model})"
 
@@ -21,6 +23,6 @@ class God
 
   modelExists: (name) =>
     Shiny.Models.klass[name]?
-    
+
 
 Shiny.God = new God

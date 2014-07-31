@@ -2,14 +2,7 @@
 
 <section class="zones">
   <ul>
-    <% @zones.each do |zone| %>
-      <%= content_tag_for :li, zone do %>
-        <%= content_tag :h2, link_to(zone.name, edit_zone_path(zone)) %>
-        <div class="status" as='Sprinkles.Status'>
-          <%= render 'sprinkles/form', zone: zone %>
-        </div>
-      <% end %>
-    <% end %>
+    <%= decorate @zones, :list %>
   </ul>
 </section>
 

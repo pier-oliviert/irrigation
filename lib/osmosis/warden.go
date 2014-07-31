@@ -5,7 +5,6 @@ import (
 	_ "github.com/lib/pq"
 	"log"
 	"time"
-	"encoding/json"
 )
 
 type Warden struct {
@@ -31,7 +30,7 @@ func NewWarden(db *sql.DB, g *GPIO) *Warden {
 func (w *Warden) updateClients() {
 	for {
 		zone := <- w.Update
-		payload, err := json.Marshal(zone)
+		payload, err := zone.MarshalJSON()
 		if err != nil {
 			log.Print(err)
 		}
@@ -54,20 +53,7 @@ func (w *Warden) updateClients() {
 func (w *Warden) monitor(db *sql.DB) {
 	for _ = range time.Tick(time.Second) {
 		for _, zone := range w.Zones.All() {
-			active := false
-			query := zone.ActiveSchedules(db)
-			if query == nil {
-				continue
-			}
-
-			for query.Next() {
-				active = true
-				break
-			}
-
-			query.Close()
-
-			if active == false && zone.Opened() {
+			if zone.ClosingTime().IsZero() && zone.Opened() {
 				w.GPIO.Send(&Command{Name: "close", Id: zone.Gpio})
 			}
 		}

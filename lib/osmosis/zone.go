@@ -5,14 +5,17 @@ import (
 	"encoding/json"
 	"log"
 	"sync"
+	"time"
 )
 
 // All those fields should be private and only
 // be accessible via Get/Set to make use of mutexes.
 type Zone struct {
-	Id    int64 `json:"id"`
-	Gpio  int64 `json:"gpio"`
-	State int64 `json:"state"`
+	Id    int64
+	Gpio  int64
+	State int64
+
+	json.Marshaler
 	mutex sync.RWMutex
 }
 
@@ -64,10 +67,10 @@ func ZonesAsJSON(zones []Zone) ([]byte, error) {
 	return json.Marshal(zones)
 }
 
-func (z *Zone) ActiveSchedules(db *sql.DB) *sql.Rows {
-	rows, err := db.Query(`select zones.gpio
-		from zones
-		inner join sprinkles
+func (z *Zone) ActiveSchedules() *sql.Rows {
+	rows, err := db.Query(`select to_char(sprinkles.ends_at, 'DD Mon IY HH24:MI:SS')
+		from sprinkles
+		inner join zones
 			on (sprinkles.zone_id = zones.id)
 		where sprinkles.ends_at > CAST(NOW() at time zone 'utc' as timestamp);`)
 
@@ -76,4 +79,44 @@ func (z *Zone) ActiveSchedules(db *sql.DB) *sql.Rows {
 	}
 
 	return rows
+}
+
+func (z *Zone) ClosingTime() time.Time {
+	var closingTime time.Time
+	if rows := z.ActiveSchedules(); rows != nil {
+		defer rows.Close()
+
+		for rows.Next() {
+			var timeStr string
+			rows.Scan(&timeStr)
+			date, _ := time.Parse("02 Jan 06 15:04:05", timeStr)
+			if closingTime.Before(date) {
+				closingTime = date
+			}
+		}
+	}
+
+	return closingTime
+
+}
+
+func (z *Zone) MarshalJSON() ([]byte, error) {
+	obj := struct {
+		Id    		int `json:"id"`
+		CloseAt   time.Time `json:"close_at"`
+		Status		string `json:"status"`
+	}{
+		Id: int(z.Id),
+		Status: "close",
+	}
+
+	if date := z.ClosingTime(); !date.IsZero() {
+		obj.CloseAt = date
+	}
+
+	if z.Opened() {
+		obj.Status = "open"
+	}
+
+	return json.Marshal(obj)
 }

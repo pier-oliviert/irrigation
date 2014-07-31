@@ -13,5 +13,7 @@ class Form
     xhr = new XHR(e.target)
     xhr.send(e.target.form.action, "POST", fd)
 
+    @element().children[0].setAttribute('selected', true)
+
 
 Shiny.Models.add Form, "Sprinkles.Form"

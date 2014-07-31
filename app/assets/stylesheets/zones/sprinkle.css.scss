@@ -1,0 +1,12 @@
+main.zones.index form.sprinkle {
+  @include flex(1);
+  @include align-self(center);
+  text-align: right;
+  div.action {
+    display: inline-block;
+  }
+
+  input[type=submit] {
+    visibility: hidden;
+  }
+}

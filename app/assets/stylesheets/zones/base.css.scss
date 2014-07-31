@@ -7,14 +7,21 @@ main.zones.index {
     border-radius: 4px;
   }
 
+  li {
+    @include display(flex);
+  }
+
   li:not(:last-child) {
     border-bottom: 1px solid #68A75C;
   }
 
   h2 {
+    @include flex(1);
     font-size: 3em;
+    a {
+      color: inherit;
+    }
   }
-
 
   a.new.zone {
     margin: 3em auto;

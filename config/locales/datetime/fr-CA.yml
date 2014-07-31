@@ -1,0 +1,6 @@
+fr-CA:
+  datetime:
+    distance_in_words:
+      less_than_x_minutes: "Moins de %{count} minutes"
+      half_a_minute: "Environ 30 secondes"
+      less_than_x_seconds: "Moins de %{count} secondes"

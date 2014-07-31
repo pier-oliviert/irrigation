@@ -4,15 +4,15 @@
   <ul>
     <% @zones.each do |zone| %>
       <li>
-        <%= content_tag :h2, zone.name %>
-        <%= link_to "Modifier", edit_zone_path(zone) %>
+        <%= content_tag :h2, link_to(zone.name, edit_zone_path(zone)) %>
         <% if zone.sprinkles.active.any? %>
-          <p> Currently working</p>
-          <%= button_to "Close", zone.sprinkles.active.first, method: :delete, remote: true %>
+          <%= render 'sprinkles/remaining', sprinkle: zone.sprinkles.active.first %>
         <% else %>
-          <%= form_for [zone, zone.sprinkles.build], builder: SprinkleBuilder, remote: true do |f| %>
-            <%= f.duration %>Secondes
-            <%= f.submit 'create' %>
+          <%= form_for [zone, zone.sprinkles.build], builder: SprinkleBuilder, remote: true, html: {class: %w(sprinkle) } do |f| %>
+            <div class="action">
+              <%= f.submit 'Ouvrir pour' %>
+              <%= f.duration %>
+            </div>
           <% end %>
         <% end %>
       </li>

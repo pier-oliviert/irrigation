@@ -14,4 +14,8 @@ class Sprinkle < ActiveRecord::Base
       return ends_at - Time.now
     end
   end
+
+  def remaining
+    ends_at - Time.now
+  end
 end

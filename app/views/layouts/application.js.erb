@@ -1,0 +1,4 @@
+(function(target) {
+  var e = new Event('<%= "#{controller_name}:#{action_name}" %>', {bubbles: true})
+  <%= yield %>
+})

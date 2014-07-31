@@ -12,7 +12,8 @@ class @XHR
 
   completed: (e) =>
     @element().removeAttribute('disabled')
-    eval(e.target.responseText)(@element())
+    if e.target.responseText.length > 1
+      eval(e.target.responseText)(@element())
 
   send: (src, method = 'GET', data) =>
     @request.open(method, src)

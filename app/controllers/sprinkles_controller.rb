@@ -8,6 +8,13 @@ class SprinklesController < ApplicationController
       }
     }
     osmosis.dispatch JSON.generate(cmd)
+
+    respond_to do |format|
+      format.html
+      format.js do
+        render nothing: true
+      end
+    end
   end
 
   def destroy
@@ -21,6 +28,12 @@ class SprinklesController < ApplicationController
       }
     }
     osmosis.dispatch JSON.generate(cmd)
+    respond_to do |format|
+      format.html
+      format.js do
+        render nothing: true
+      end
+    end
   end
 
   protected

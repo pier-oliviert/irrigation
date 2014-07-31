@@ -14,6 +14,7 @@
 //= require jquery
 //= require xhr
 //= require_tree ./shiny.js
+//= require_tree ./zones
 //= require_self
 //= require listener
 
